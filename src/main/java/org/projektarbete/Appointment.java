@@ -61,7 +61,7 @@ public class Appointment {
             throw new IllegalArgumentException("Ogiltigt datumformat. Använd ÅÅÅÅ-MM-DD");
         }
         LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ÅÅÅÅ-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate providedDate = LocalDate.parse(date,formatter);
 
         if (providedDate.isBefore(currentDate)){
