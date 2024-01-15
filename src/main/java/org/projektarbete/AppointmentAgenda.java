@@ -1,10 +1,13 @@
 package org.projektarbete;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class AppointmentAgenda {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private static final List<Appointment> appointments = new ArrayList<>();
     private static final int ADD_APPOINTMENT_OPTION = 1;
     private static final int SEARCH_APPOINTMENT_OPTION = 2;
     private static final int UPDATE_APPOINTMENT_OPTION = 3;
@@ -59,11 +62,13 @@ public class AppointmentAgenda {
                 System.out.println("------------------------------------------------------------");
                 System.out.println("                     Lägg till nytt möte");
                 System.out.println("------------------------------------------------------------\n");
+                addAppointment();
                 break;
             case SEARCH_APPOINTMENT_OPTION:
                 System.out.println("\n------------------------------------------------------------");
                 System.out.println("                         Söker...");
                 System.out.println("------------------------------------------------------------\n");
+                searchMenu();
                 System.out.println("\n------------------------------------------------------------");
                 System.out.println("                    Slutet på sökningen");
                 System.out.println("------------------------------------------------------------\n\n");
@@ -72,16 +77,19 @@ public class AppointmentAgenda {
                 System.out.println("------------------------------------------------------------");
                 System.out.println("                     Uppdatera möte");
                 System.out.println("------------------------------------------------------------\n");
+                updateMenu();
                 break;
             case DELETE_APPOINTMENT_OPTION:
                 System.out.println("------------------------------------------------------------");
                 System.out.println("                    Ta bort möte");
                 System.out.println("------------------------------------------------------------\n");
+                deleteAppointment();
                 break;
             case SHOW_ALL_APPOINTMENTS_OPTION:
                 System.out.println("------------------------------------------------------------");
                 System.out.println("                    Schemalagda möten");
                 System.out.println("------------------------------------------------------------\n\n");
+                showAllAppointments();
                 System.out.println("\n------------------------------------------------------------");
                 System.out.println("                      Slut på samråd");
                 System.out.println("------------------------------------------------------------\n");
@@ -94,6 +102,8 @@ public class AppointmentAgenda {
                 break;
         }
     }
+
+
     private static void updateMenu() {
     }
 
@@ -238,4 +248,3 @@ public class AppointmentAgenda {
         }
     }
 }
-
