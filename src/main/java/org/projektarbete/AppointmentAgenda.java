@@ -94,4 +94,148 @@ public class AppointmentAgenda {
                 break;
         }
     }
+    private static void updateMenu() {
+    }
+
+    private static void searchMenu() {
+    }
+
+    private static void addAppointment() {
+        try {
+            System.out.println("Ange fullständigt namn:");
+            String name = scanner.nextLine();
+
+            System.out.println("\nAnge personnummer:");
+            String idNumber = scanner.nextLine();
+
+            System.out.println("\nAnge e-postadress:");
+            String email = scanner.nextLine();
+
+            System.out.println("\nAnge datum för mötet:");
+            String date = scanner.nextLine();
+
+            System.out.println("\nAnge tid för mötet:");
+            String time = scanner.nextLine();
+
+            System.out.println("\nAnge en beskrivning av mötet:");
+            String description = scanner.nextLine();
+
+            // Definiera ett nytt möte och lägg till det i listan
+            Appointment newAppointment = new Appointment(appointments.size() + name, idNumber, email, date, time, description);
+            appointments.add(newAppointment);
+
+            System.out.println("\nDitt möte har lagts till framgångsrikt!\n");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Fel: " + e.getMessage());
+        }
+    }
+
+
+    private static void deleteAppointment() {
+        try {
+            int option;
+            do {
+                System.out.println("Välj alternativ för att ta bort möte:");
+                System.out.println("1. Ange namn");
+                System.out.println("2. Ange personnummer");
+                System.out.println("3. Ange datum");
+                System.out.println("4. Radera alla möten");
+                System.out.println("5. Gå tillbaka till huvudmenyn");
+                option = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (option) {
+                    case 1:
+                        deleteByName();
+                        break;
+                    case 2:
+                        deleteByIdNumber();
+                        break;
+                    case 3:
+                        deleteByDate();
+                        break;
+                    case 4:
+                        deleteAllAppointments();
+                        break;
+                    case 5:
+                        System.out.println("Återgår till huvudmenyn.");
+                        break;
+                    default:
+                        System.out.println("Ogiltigt alternativ. Försök igen.");
+                }
+            } while (option != 5);
+        } catch (InputMismatchException e) {
+            System.out.println("Fel: Ange en giltig siffra.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void deleteByName() {
+        System.out.println("Ange namnet för mötet du vill ta bort:");
+        String appointmentName = scanner.nextLine();
+
+        appointments.removeIf(appointment -> appointment.getName().equalsIgnoreCase(appointmentName));
+
+        System.out.println("Mötet med namnet '" + appointmentName + "' har tagits bort.");
+    }
+
+    private static void deleteByIdNumber() {
+        try {
+            System.out.println("Ange personnumret som är kopplat till mötet du vill ta bort:");
+            String appointmentIdNumber = scanner.next();
+
+            boolean removed = appointments.removeIf(appointment -> appointment.getIdNumber().equals(appointmentIdNumber));
+
+            if (removed) {
+                System.out.println("Mötet med personnumret" + appointmentIdNumber + " har tagits bort.");
+            } else {
+                System.out.println("Inget möte hittades med personnumret " + appointmentIdNumber);
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Fel: Ange ett giltigt personnummer.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void deleteByDate() {
+        System.out.println("Ange datumet för mötet du vill ta bort:");
+        String appointmentDate = scanner.nextLine();
+
+        appointments.removeIf(appointment -> appointment.getDate().equalsIgnoreCase(appointmentDate));
+
+        System.out.println("Möten med datumet '" + appointmentDate + "' har tagits bort.");
+    }
+
+    private static void deleteAllAppointments() {
+        System.out.println("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
+        String confirmation = scanner.nextLine();
+
+        if (confirmation.equalsIgnoreCase("ja")) {
+            appointments.clear();
+            System.out.println("Alla möten har raderats.");
+        } else {
+            System.out.println("Radering av alla möten avbruten.");
+        }
+    }
+    private static void printAppointmentDetails(Appointment appointment) {
+        System.out.println("Mötet med följande detaljer hittades:");
+        System.out.println("Namn: " + appointment.getName());
+        System.out.println("Personnummer: " + appointment.getIdNumber());
+        System.out.println("E-postadress: " + appointment.getEmail());
+        System.out.println("Datum: " + appointment.getDate());
+        System.out.println("Tid: " + appointment.getTime());
+        System.out.println("Beskrivning: " + appointment.getDescription());
+        System.out.println("------------------------------------------------------------");
+    }
+
+    private static void showAllAppointments() {
+        if (appointments.isEmpty()) {
+            System.out.println("Inga möten är schemalagda för närvarande.");
+        } else {
+            for (Appointment appointment : appointments) {
+                printAppointmentDetails(appointment);
+            }
+        }
+    }
 }
+
