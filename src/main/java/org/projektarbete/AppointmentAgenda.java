@@ -1,13 +1,18 @@
 package org.projektarbete;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.projektarbete.Appointment.*;
 
 public class AppointmentAgenda {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final List<Appointment> appointments = new ArrayList<>();
+    private static final AtomicInteger idCounter = new AtomicInteger(1);
+
     private static final int ADD_APPOINTMENT_OPTION = 1;
     private static final int SEARCH_APPOINTMENT_OPTION = 2;
     private static final int UPDATE_APPOINTMENT_OPTION = 3;
@@ -103,7 +108,6 @@ public class AppointmentAgenda {
         }
     }
 
-
     private static void updateMenu() {
     }
 
@@ -115,23 +119,38 @@ public class AppointmentAgenda {
             System.out.println("Ange fullständigt namn:");
             String name = scanner.nextLine();
 
-            System.out.println("\nAnge personnummer:");
+            System.out.println("\nAnge ditt 10-siffriga personnummer:");
             String idNumber = scanner.nextLine();
 
             System.out.println("\nAnge e-postadress:");
             String email = scanner.nextLine();
 
-            System.out.println("\nAnge datum för mötet:");
+            System.out.println("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD):");
             String date = scanner.nextLine();
 
-            System.out.println("\nAnge tid för mötet:");
+            System.out.println("\nAnge tid för mötet med format (HH:MM):");
             String time = scanner.nextLine();
 
             System.out.println("\nAnge en beskrivning av mötet:");
             String description = scanner.nextLine();
 
-            // Definiera ett nytt möte och lägg till det i listan
-            Appointment newAppointment = new Appointment(appointments.size() + name, idNumber, email, date, time, description);
+            validateName(name);
+            validateIdNumber(idNumber);
+            validateEmail(email);
+            validateDate(date);
+            validateTime(time);
+            validateDescription(description);
+
+            Appointment newAppointment = new Appointment(
+                    generateUniqueId(),
+                    name,
+                    idNumber,
+                    email,
+                    date,
+                    time,
+                    description
+            );
+
             appointments.add(newAppointment);
 
             System.out.println("\nDitt möte har lagts till framgångsrikt!\n");
@@ -140,6 +159,8 @@ public class AppointmentAgenda {
         }
     }
 
+    private static void validateName(String name) {
+    }
 
     private static void deleteAppointment() {
         try {
@@ -179,7 +200,6 @@ public class AppointmentAgenda {
             scanner.nextLine();
         }
     }
-
     private static void deleteByName() {
         System.out.println("Ange namnet för mötet du vill ta bort:");
         String appointmentName = scanner.nextLine();
@@ -188,7 +208,6 @@ public class AppointmentAgenda {
 
         System.out.println("Mötet med namnet '" + appointmentName + "' har tagits bort.");
     }
-
     private static void deleteByIdNumber() {
         try {
             System.out.println("Ange personnumret som är kopplat till mötet du vill ta bort:");
@@ -227,8 +246,10 @@ public class AppointmentAgenda {
             System.out.println("Radering av alla möten avbruten.");
         }
     }
+
     private static void printAppointmentDetails(Appointment appointment) {
         System.out.println("Mötet med följande detaljer hittades:");
+        System.out.println("ID: " + appointment.getId());
         System.out.println("Namn: " + appointment.getName());
         System.out.println("Personnummer: " + appointment.getIdNumber());
         System.out.println("E-postadress: " + appointment.getEmail());
@@ -246,5 +267,10 @@ public class AppointmentAgenda {
                 printAppointmentDetails(appointment);
             }
         }
+    }
+    private static int generateUniqueId() {
+        return idCounter.getAndIncrement();
+
+
     }
 }
