@@ -1,8 +1,9 @@
 package org.projektarbete;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 public class Appointment {
-    //private final int id;
+    private final int id;
     private final String name;
     private final String idNumber;
     private final String email;
@@ -10,9 +11,9 @@ public class Appointment {
     private final String time;
     private final String description;
 
-    public Appointment(String name, String idNumber, String email, String date, String time, String description) {
+    public Appointment(int id, String name, String idNumber, String email, String date, String time, String description) {
         validateAppointmentInput(name, idNumber, email, date, time, description);
-        //this.id = id;
+        this.id = id;
         this.name = name;
         this.idNumber = idNumber;
         this.email = email;
@@ -83,9 +84,9 @@ public class Appointment {
 
 
     // Getters
-    //public int getId() {
-      //  return id;
-    //}
+    public int getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
