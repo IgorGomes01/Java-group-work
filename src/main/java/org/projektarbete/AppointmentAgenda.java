@@ -133,13 +133,16 @@ public class AppointmentAgenda {
 
             System.out.println("\nAnge en beskrivning av mötet:");
             String description = scanner.nextLine();
-
+/*
+*Added an array list here to as the second argument
+*Used for collection and accumulation of error messages during validation process
+ */
             validateName(name);
-            validateIdNumber(idNumber);
-            validateEmail(email);
-            validateDate(date);
-            validateTime(time);
-            validateDescription(description);
+            validateIdNumber(idNumber,new ArrayList<>());
+            validateEmail(email, new ArrayList<>());
+            validateDate(date, new ArrayList<>());
+            validateTime(time, new ArrayList<>());
+            validateDescription(description,new ArrayList<>());
 
             Appointment newAppointment = new Appointment(
                     generateUniqueId(),

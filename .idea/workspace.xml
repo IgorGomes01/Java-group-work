@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Basic functions have been updated">
+    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Updated the validateDate.now cannoct book meeting in the past.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +25,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
@@ -37,6 +38,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Appointment.executor": "Run",
     "Application.AppointmentAgenda.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -49,11 +51,30 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "C:/Users/zion.awino/java testing/Javagroupwork/Java grgouup work/src/main/java/org/example/Main.java",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "module"
+    ]
   }
 }]]></component>
   <component name="RunManager">
+    <configuration name="Appointment" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.projektarbete.Appointment" />
+      <module name="Javagroupwork" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.projektarbete.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
         <option name="Make" enabled="true" />
@@ -65,6 +86,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Appointment" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -82,7 +108,8 @@
       <option name="presentableId" value="Default" />
       <updated>1704806365135</updated>
       <workItem from="1704806366219" duration="3000" />
-      <workItem from="1705254611535" duration="5665000" />
+      <workItem from="1705254611535" duration="13245000" />
+      <workItem from="1705506929137" duration="2281000" />
     </task>
     <task id="LOCAL−00001" summary="Basic functions have been updated">
       <option name="closed" value="true" />
@@ -91,7 +118,14 @@
       <option name="presentableId" value="LOCAL−00001" />
       <updated>1705323121724</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL−00002" summary="Updated the validateDate.now cannoct book meeting in the past.">
+      <option name="closed" value="true" />
+      <created>1705324573111</created>
+      <option name="number" value="LOCAL−00002" />
+      <option name="presentableId" value="LOCAL−00002" />
+      <updated>1705324573111</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -110,6 +144,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Basic functions have been updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="Basic functions have been updated" />
+    <MESSAGE value="Updated the validateDate.now cannoct book meeting in the past." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the validateDate.now cannoct book meeting in the past." />
   </component>
 </project>
