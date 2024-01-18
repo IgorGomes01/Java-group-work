@@ -202,13 +202,15 @@ public class AppointmentAgenda {
             String date = input.readString("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD): ");
             String time = input.readString("\nAnge tid för mötet med format (HH:MM): ");
             String description = input.readString("\nAnge en beskrivning av mötet: ");
-
+/*
+*Allows accumulation of errors while inputing
+ */
             validateName(name);
-            validateIdNumber(idNumber);
-            validateEmail(email);
-            validateDate(date);
-            validateTime(time);
-            validateDescription(description);
+            validateIdNumber(idNumber,new ArrayList<>());
+            validateEmail(email,new ArrayList<>());
+            validateDate(date,new ArrayList<>());
+            validateTime(time,new ArrayList<>());
+            validateDescription(description,new ArrayList<>());
 
             Appointment newAppointment = new Appointment(
                     generateUniqueId(),

@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Updated the validateDate.now cannoct book meeting in the past.">
+    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Updated the validation methods. added comments on changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +107,7 @@
       <updated>1704806365135</updated>
       <workItem from="1704806366219" duration="3000" />
       <workItem from="1705254611535" duration="13245000" />
-      <workItem from="1705506929137" duration="2281000" />
+      <workItem from="1705506929137" duration="4331000" />
     </task>
     <task id="LOCAL−00001" summary="Basic functions have been updated">
       <option name="closed" value="true" />
@@ -125,7 +123,14 @@
       <option name="presentableId" value="LOCAL−00002" />
       <updated>1705324573111</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL−00003" summary="Updated the validation methods. added comments on changes.">
+      <option name="closed" value="true" />
+      <created>1705509290019</created>
+      <option name="number" value="LOCAL−00003" />
+      <option name="presentableId" value="LOCAL−00003" />
+      <updated>1705509290020</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -145,6 +150,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Basic functions have been updated" />
     <MESSAGE value="Updated the validateDate.now cannoct book meeting in the past." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated the validateDate.now cannoct book meeting in the past." />
+    <MESSAGE value="Updated the validation methods. added comments on changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the validation methods. added comments on changes." />
   </component>
 </project>
