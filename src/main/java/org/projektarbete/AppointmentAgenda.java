@@ -1,6 +1,6 @@
 package org.projektarbete;
+import java.sql.SQLOutput;
 import java.util.InputMismatchException;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,7 +9,7 @@ import static org.projektarbete.Appointment.*;
 
 public class AppointmentAgenda {
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final InputReader input = new InputReader();
     private static final List<Appointment> appointments = new ArrayList<>();
     private static final AtomicInteger idCounter = new AtomicInteger(1);
 
@@ -21,6 +21,7 @@ public class AppointmentAgenda {
     private static final int EXIT_OPTION = 6;
 
     public static void main(String[] args) {
+        load();
         mainMenuOptions();
     }
 
@@ -32,12 +33,10 @@ public class AppointmentAgenda {
 
             while (true) {
                 try {
-                    option = scanner.nextInt();
-                    scanner.nextLine();
+                    option = input.readInt("Ange val");
                     break;
                 } catch (InputMismatchException e) {
                     System.out.println("Var god ange ett giltigt heltal.");
-                    scanner.nextLine();
                 }
             }
 
@@ -73,7 +72,7 @@ public class AppointmentAgenda {
                 System.out.println("\n------------------------------------------------------------");
                 System.out.println("                         Söker...");
                 System.out.println("------------------------------------------------------------\n");
-                searchMenu();
+                searchAppointment();
                 System.out.println("\n------------------------------------------------------------");
                 System.out.println("                    Slutet på sökningen");
                 System.out.println("------------------------------------------------------------\n\n");
@@ -82,7 +81,7 @@ public class AppointmentAgenda {
                 System.out.println("------------------------------------------------------------");
                 System.out.println("                     Uppdatera möte");
                 System.out.println("------------------------------------------------------------\n");
-                updateMenu();
+                updateAppointment();
                 break;
             case DELETE_APPOINTMENT_OPTION:
                 System.out.println("------------------------------------------------------------");
@@ -107,32 +106,102 @@ public class AppointmentAgenda {
                 break;
         }
     }
+    //Har bara gjort själva menyn
+    private static void printUpdateAppointmentmenu(){
+        System.out.println("1: Uppdatera namn ");
+        System.out.println("2: Uppdatera personnummer ");
+        System.out.println("3: Uppdatera E-post");
+        System.out.println("4: Uppdatera datum");
+        System.out.println("5: Uppdatera tid");
+        System.out.println("6: Uppdatera beskrivning");
+        System.out.println("7: Återgå till huvudmenyn");
+    }
+    //Visar menyn
+    private static void updateAppointment() {
+        printUpdateAppointmentmenu();
 
-    private static void updateMenu() {
     }
 
-    private static void searchMenu() {
+    //Visar menyn för att söka efter möten
+    private static void printFindAppointmentsMenu() {
+        //MENY SOM SKA PRINTAS
+        System.out.println("1: Sök efter namn ");
+        System.out.println("2: Sök efter personnummer ");
+        System.out.println("3: Sök efter datum");
+        System.out.println("4: Återgå till huvudmenyn");
+    }
+
+    //Själva valen för sökning av respektive namn, personnummer, datum.
+    private static void appointmentChoice() {
+
+        int option = input.readInt("Ange val>");
+
+        switch (option) {
+            case 1:
+                String name = input.readString("Sök efter namn: ");
+                findName(name);
+                break;
+
+            case 2:
+                System.out.println("Sök efter 10-siffrigt personnummer: ");
+                String idNumber;
+                do {
+                    idNumber = input.readString("");
+                    if (idNumber.length()!= 10){
+                        System.out.println("FEL: OBS personnummret måste vara 10 siffror långt");
+                    }
+                }while (idNumber.length()!= 10);
+                findSSNumber(idNumber);
+                break;
+
+            case 3:
+                String date = input.readString("Sök efter datum: ");
+                findDate(date);
+                break;
+        }
+    }
+
+    private static void searchAppointment(){
+        printFindAppointmentsMenu();
+        appointmentChoice();
+    }
+
+    private static void findName(String s) {
+        for (Appointment app : appointments){
+            if (app.getName().equals(s)){
+                System.out.println(app.toString());
+                return;
+            }
+        }
+        System.out.println("FEL: Ingen bokning i detta namnet hittades.");
+    }
+    private static void findSSNumber(String id) {
+        for (Appointment app : appointments){
+            if (app.getIdNumber().equals(id)){
+                System.out.println(app.toString());
+                return;
+            }
+        }
+        System.out.printf("FEL: Ingen bokning med detta personnummer hittades.");
+    }
+    private static void findDate(String date) {
+        for (Appointment app : appointments){
+            if (app.getDate().equals(date)){
+                System.out.println(app.toString());
+                return;
+            }
+        }
+        System.out.printf("FEL: Ingen bokning hittades på det sökta datumet %s.%n", date);
     }
 
     private static void addAppointment() {
         try {
-            System.out.println("Ange fullständigt namn:");
-            String name = scanner.nextLine();
-
-            System.out.println("\nAnge ditt 10-siffriga personnummer:");
-            String idNumber = scanner.nextLine();
-
-            System.out.println("\nAnge e-postadress:");
-            String email = scanner.nextLine();
-
-            System.out.println("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD):");
-            String date = scanner.nextLine();
-
-            System.out.println("\nAnge tid för mötet med format (HH:MM):");
-            String time = scanner.nextLine();
-
-            System.out.println("\nAnge en beskrivning av mötet:");
-            String description = scanner.nextLine();
+            String name = input.readString("Ange fullständigt namn: ");
+            String idNumber = input.readString("\nAnge ditt 10-siffriga personnummer: ");
+            String email = input.readString("\nAnge e-postadress: ");
+            String date = input.readString("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD): ");
+            String time = input.readString("\nAnge tid för mötet med format (HH:MM): ");
+            String description = input.readString("\nAnge en beskrivning av mötet: ");
 
             validateName(name);
             validateIdNumber(idNumber);
@@ -172,8 +241,7 @@ public class AppointmentAgenda {
                 System.out.println("3. Ange datum");
                 System.out.println("4. Radera alla möten");
                 System.out.println("5. Gå tillbaka till huvudmenyn");
-                option = scanner.nextInt();
-                scanner.nextLine();
+                option = input.readInt("");
 
                 switch (option) {
                     case 1:
@@ -197,21 +265,17 @@ public class AppointmentAgenda {
             } while (option != 5);
         } catch (InputMismatchException e) {
             System.out.println("Fel: Ange en giltig siffra.");
-            scanner.nextLine();
+            input.readInt("");
         }
     }
     private static void deleteByName() {
-        System.out.println("Ange namnet för mötet du vill ta bort:");
-        String appointmentName = scanner.nextLine();
-
+        String appointmentName = input.readString("Ange namnet för mötet du vill ta bort: ");
         appointments.removeIf(appointment -> appointment.getName().equalsIgnoreCase(appointmentName));
-
         System.out.println("Mötet med namnet '" + appointmentName + "' har tagits bort.");
     }
     private static void deleteByIdNumber() {
         try {
-            System.out.println("Ange personnumret som är kopplat till mötet du vill ta bort:");
-            String appointmentIdNumber = scanner.next();
+            String appointmentIdNumber = input.readString("Ange personnumret som är kopplat till mötet du vill ta bort:");
 
             boolean removed = appointments.removeIf(appointment -> appointment.getIdNumber().equals(appointmentIdNumber));
 
@@ -222,13 +286,12 @@ public class AppointmentAgenda {
             }
         } catch (InputMismatchException e) {
             System.out.println("Fel: Ange ett giltigt personnummer.");
-            scanner.nextLine();
+            input.readInt("");
         }
     }
 
     private static void deleteByDate() {
-        System.out.println("Ange datumet för mötet du vill ta bort:");
-        String appointmentDate = scanner.nextLine();
+        String appointmentDate = input.readString("Ange datumet för mötet du vill ta bort: ");
 
         appointments.removeIf(appointment -> appointment.getDate().equalsIgnoreCase(appointmentDate));
 
@@ -236,8 +299,7 @@ public class AppointmentAgenda {
     }
 
     private static void deleteAllAppointments() {
-        System.out.println("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
-        String confirmation = scanner.nextLine();
+        String confirmation = input.readString("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
 
         if (confirmation.equalsIgnoreCase("ja")) {
             appointments.clear();
@@ -272,5 +334,15 @@ public class AppointmentAgenda {
         return idCounter.getAndIncrement();
 
 
+    }
+
+
+    //Denna är bara tilllagd som test för att altid ha peroner i listan.
+    //Ska tas bort till redovisningen.
+    private static void load(){
+        Appointment app1 = new Appointment(1234, "app1", "1212121212", "mattias@outlook.com", "2025-12-12", "15:30", "bokning1");
+        appointments.add(app1);
+        Appointment app2 = new Appointment(4242, "app2", "5252525252", "mattias@hotmail.com", "2024-12-12", "15:35", "bokning2");
+        appointments.add(app2);
     }
 }

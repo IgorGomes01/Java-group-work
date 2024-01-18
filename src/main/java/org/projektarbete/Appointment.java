@@ -111,4 +111,8 @@ public class Appointment {
     public String getDescription() {
         return description;
     }
+
+    public String toString(){
+        return "Namn:\t%s%nPersonnummer:\t%s%nE-post:\t%s%nDatum:\t%s%nTid:\t%s%nBeskrivning:\t%s%n".formatted(name, idNumber,email,date,time,description);
+    }
 }
