@@ -1,29 +1,63 @@
 package org.projektarbete;
-
 import java.util.Scanner;
 
-public class InputReader {
+/**
+ * En klass som hanterar inläsning av användarinmatning från terminalen.
+ */
+public class InputReader implements AutoCloseable {
 
-    Scanner input = new Scanner(System.in);
+    private final Scanner input = new Scanner(System.in);
 
     /**
-     * Läser in en sträng från tangentbordet
+     * Läser in en sträng från terminalen.
      *
-     * @param prompt är det som användaren ska svara på
-     * @return vad användaren skrev in
+     * @param prompt en prompt som visas för användaren
+     * @return den inmatade strängen från användaren
      */
     public String readString(String prompt) {
-        System.out.print(prompt);
+        System.out.print(prompt + " ");
         return input.nextLine();
-
     }
 
-    public int readInt(String prompt) {
-        System.out.print(prompt);
-        int number = input.nextInt();
-        input.nextLine();
-        return number;
+    /**
+     * Läser in en hel rad från terminalen.
+     *
+     * @return den inmatade raden från användaren
+     */
+    public String nextLine() {
+        return input.nextLine();
+    }
 
+    /**
+     * Läser in ett enskilt ord eller token från terminalen.
+     *
+     * @return det inmatade ordet eller tokenet från användaren
+     */
+    public String next() {
+        return input.next();
+    }
+
+    /**
+     * Läser in ett heltal från terminalen.
+     *
+     * @return det inmatade heltalet från användaren
+     */
+    public int nextInt() {
+        return input.nextInt();
+    }
+
+    /**
+     * Stänger Scanner-objektet för att slutföra inmatningsoperationer.
+     */
+    public void closeScanner() {
+        input.close();
+    }
+
+    /**
+     * Stänger InputReader och därmed även Scanner-objektet.
+     */
+    @Override
+    public void close() {
+        closeScanner();
     }
 }
-
