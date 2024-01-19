@@ -1,350 +1,308 @@
 package org.projektarbete;
-import java.sql.SQLOutput;
+import java.sql.*;
 import java.util.InputMismatchException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.projektarbete.Appointment.*;
-
+/**
+ * AppointmentAgenda-klassen hanterar mötesagendan och interaktionen med användaren.
+ * Den innehåller också huvudmetoden för att köra programmet.
+ */
 public class AppointmentAgenda {
+    static final InputReader inputReader = new InputReader(); // Instans av InputReader för att hantera användarinput
+    private static final AppointmentRepository appointmentRepository = new AppointmentRepository(); // Instans av AppointmentRepository för att hantera mötesdata
+    private static final String FIELD_ID_NUMBER = "idNumber"; // Konstant för fältet ID-nummer i mötesdata
+    private static final String FIELD_NAME = "name"; // Konstant för fältet namn i mötesdata
+    private static final String FIELD_DATE = "date"; // Konstant för fältet datum i mötesdata
 
-    private static final InputReader input = new InputReader();
-    private static final List<Appointment> appointments = new ArrayList<>();
-    private static final AtomicInteger idCounter = new AtomicInteger(1);
-
-    private static final int ADD_APPOINTMENT_OPTION = 1;
-    private static final int SEARCH_APPOINTMENT_OPTION = 2;
-    private static final int UPDATE_APPOINTMENT_OPTION = 3;
-    private static final int DELETE_APPOINTMENT_OPTION = 4;
-    private static final int SHOW_ALL_APPOINTMENTS_OPTION = 5;
-    private static final int EXIT_OPTION = 6;
-
+    /**
+     * Huvudmetod för att köra programmet. Initialiserar AppointmentRepository och etablerar en databasanslutning.
+     * Anropar sedan huvudmenyoptionerna och stänger av skannern när den inte längre behövs.
+     */
     public static void main(String[] args) {
-        load();
-        mainMenuOptions();
+        appointmentRepository.initializeDatabase();
+
+        UserInterface.mainMenuOptions();
+
+        inputReader.closeScanner();
+
+        appointmentRepository.closeInputReader();
     }
 
-    private static void mainMenuOptions() {
-        int option;
+    /**
+     * Lägger till ett nytt möte genom att begära användarinput för mötesinformation.
+     * Visar sedan totalt antal möten i systemet efter att ha lagt till det nya mötet.
+     */
+    static void addAppointment() {
+        try {
+            System.out.println("Ange fullständigt namn:");
+            String name = inputReader.readString("");
+
+            System.out.println("\nAnge ditt 10-siffriga personnummer:");
+            String idNumber = inputReader.readString("");
+
+            System.out.println("\nAnge e-postadress:");
+            String email = inputReader.readString("");
+
+            System.out.println("\nAnge datum för mötet:");
+            String date = inputReader.readString("");
+
+            System.out.println("\nAnge tid för mötet:");
+            String time = inputReader.readString("");
+
+            System.out.println("\nAnge en beskrivning av mötet:");
+            String description = inputReader.readString("");
+
+            Appointment newAppointment = new Appointment(name, idNumber, email, date, time, description);
+            appointmentRepository.addAppointment(newAppointment);
+
+            System.out.println("\nDitt möte har sparats korrekt.\n");
+
+            System.out.println("Totalt antal möten i systemet: " + appointmentRepository.getRecordCount() + "\n");
+
+        } catch (InputMismatchException e) {
+            System.out.println("Fel: Ange giltiga data.");
+            inputReader.readString(""); // Konsumera ogiltig inmatning
+        }
+    }
+
+    /**
+     * Huvudmeny för sökalternativ. Användaren kan välja att söka efter namn, personnummer, datum eller återgå till huvudmenyn.
+     */
+    static void searchMenu() {
+        int searchOption = 0;
 
         do {
-            displayMainMenu();
+            System.out.println("Välj sökkriterium:");
+            System.out.println("1 - Sök efter namn");
+            System.out.println("2 - Sök efter personnummer");
+            System.out.println("3 - Sök efter datum");
+            System.out.println("4 - Återgå till huvudmenyn");
 
-            while (true) {
-                try {
-                    option = input.readInt("Ange val");
-                    break;
-                } catch (InputMismatchException e) {
-                    System.out.println("Var god ange ett giltigt heltal.");
+            try {
+                searchOption = inputReader.nextInt();
+
+                // Konsumera resten av raden
+                inputReader.nextLine();
+
+                switch (searchOption) {
+                    case 1 -> searchByName();
+                    case 2 -> searchByIdNumber();
+                    case 3 -> searchByDate();
+                    case 4 -> System.out.println("Återgår till huvudmenyn...");
+                    default -> System.out.println("Ogiltigt alternativ.");
                 }
+
+                if (searchOption != 4 && askForContinue("sökning")) {
+                    // Fortsätt söka
+                } else {
+                    // Återgå till huvudmenyn
+                    return;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Var god ange ett giltigt heltal.");
+                inputReader.nextLine(); // Konsumera ogiltig inmatning
             }
-
-            processMainMenuOption(option);
-
-        } while (option != EXIT_OPTION);
+        } while (searchOption != 4);
     }
 
-    private static void displayMainMenu() {
-        System.out.println("------------------------------------------------------------");
-        System.out.println("                       MÖTESCHEMA");
-        System.out.println("------------------------------------------------------------\n");
-
-        System.out.println(" ANGE ETT ALTERNATIV\n");
-        System.out.println(" " + ADD_APPOINTMENT_OPTION + " - LÄGG TILL NYTT MÖTE");
-        System.out.println(" " + SEARCH_APPOINTMENT_OPTION + " - SÖK MÖTE");
-        System.out.println(" " + UPDATE_APPOINTMENT_OPTION + " - UPPDATERA MÖTE");
-        System.out.println(" " + DELETE_APPOINTMENT_OPTION + " - TA BORT MÖTE");
-        System.out.println(" " + SHOW_ALL_APPOINTMENTS_OPTION + " - VISA ALLA MÖTEN");
-        System.out.println(" " + EXIT_OPTION + " - AVSLUTA PROGRAMMET");
-        System.out.println("------------------------------------------------------------\n");
+    private static void searchByName() {
+        System.out.println("Ange namn att söka efter:");
+        String name = inputReader.nextLine();
+        searchByField("name", name);
     }
 
-    private static void processMainMenuOption(int option) {
-        switch (option) {
-            case ADD_APPOINTMENT_OPTION:
-                System.out.println("------------------------------------------------------------");
-                System.out.println("                     Lägg till nytt möte");
-                System.out.println("------------------------------------------------------------\n");
-                addAppointment();
-                break;
-            case SEARCH_APPOINTMENT_OPTION:
-                System.out.println("\n------------------------------------------------------------");
-                System.out.println("                         Söker...");
-                System.out.println("------------------------------------------------------------\n");
-                searchAppointment();
-                System.out.println("\n------------------------------------------------------------");
-                System.out.println("                    Slutet på sökningen");
-                System.out.println("------------------------------------------------------------\n\n");
-                break;
-            case UPDATE_APPOINTMENT_OPTION:
-                System.out.println("------------------------------------------------------------");
-                System.out.println("                     Uppdatera möte");
-                System.out.println("------------------------------------------------------------\n");
-                updateAppointment();
-                break;
-            case DELETE_APPOINTMENT_OPTION:
-                System.out.println("------------------------------------------------------------");
-                System.out.println("                    Ta bort möte");
-                System.out.println("------------------------------------------------------------\n");
-                deleteAppointment();
-                break;
-            case SHOW_ALL_APPOINTMENTS_OPTION:
-                System.out.println("------------------------------------------------------------");
-                System.out.println("                    Schemalagda möten");
-                System.out.println("------------------------------------------------------------\n\n");
-                showAllAppointments();
-                System.out.println("\n------------------------------------------------------------");
-                System.out.println("                      Slut på samråd");
-                System.out.println("------------------------------------------------------------\n");
-                break;
-            case EXIT_OPTION:
-                System.out.println("Avslutar programmet. Adjö!");
-                break;
-            default:
-                System.out.println("Ogiltigt alternativ");
-                break;
-        }
-    }
-    //Har bara gjort själva menyn
-    private static void printUpdateAppointmentmenu(){
-        System.out.println("1: Uppdatera namn ");
-        System.out.println("2: Uppdatera personnummer ");
-        System.out.println("3: Uppdatera E-post");
-        System.out.println("4: Uppdatera datum");
-        System.out.println("5: Uppdatera tid");
-        System.out.println("6: Uppdatera beskrivning");
-        System.out.println("7: Återgå till huvudmenyn");
-    }
-    //Visar menyn
-    private static void updateAppointment() {
-        printUpdateAppointmentmenu();
-
+    private static void searchByIdNumber() {
+        System.out.println("Ange personnummer att söka efter:");
+        String idNumber = inputReader.nextLine();
+        searchByField("idNumber", idNumber);
     }
 
-    //Visar menyn för att söka efter möten
-    private static void printFindAppointmentsMenu() {
-        //MENY SOM SKA PRINTAS
-        System.out.println("1: Sök efter namn ");
-        System.out.println("2: Sök efter personnummer ");
-        System.out.println("3: Sök efter datum");
-        System.out.println("4: Återgå till huvudmenyn");
+    private static void searchByDate() {
+        System.out.println("Ange datum att söka efter:");
+        String date = inputReader.nextLine();
+        searchByField("date", date);
     }
 
-    //Själva valen för sökning av respektive namn, personnummer, datum.
-    private static void appointmentChoice() {
-
-        int option = input.readInt("Ange val>");
-
-        switch (option) {
-            case 1:
-                String name = input.readString("Sök efter namn: ");
-                findName(name);
-                break;
-
-            case 2:
-                System.out.println("Sök efter 10-siffrigt personnummer: ");
-                String idNumber;
-                do {
-                    idNumber = input.readString("");
-                    if (idNumber.length()!= 10){
-                        System.out.println("FEL: OBS personnummret måste vara 10 siffror långt");
-                    }
-                }while (idNumber.length()!= 10);
-                findSSNumber(idNumber);
-                break;
-
-            case 3:
-                String date = input.readString("Sök efter datum: ");
-                findDate(date);
-                break;
-        }
+    private static void searchByField(String field, String value) {
+        appointmentRepository.searchByField(field, value);
     }
 
-    private static void searchAppointment(){
-        printFindAppointmentsMenu();
-        appointmentChoice();
-    }
+    /**
+     * Huvudmeny för uppdateringsalternativ. Användaren kan välja att uppdatera efter namn, personnummer, datum eller återgå till huvudmenyn.
+     */
+    static void updateMenu() {
+        boolean exitUpdateMenu = false;
 
-    private static void findName(String s) {
-        for (Appointment app : appointments){
-            if (app.getName().equals(s)){
-                System.out.println(app.toString());
-                return;
-            }
-        }
-        System.out.println("FEL: Ingen bokning i detta namnet hittades.");
-    }
-    private static void findSSNumber(String id) {
-        for (Appointment app : appointments){
-            if (app.getIdNumber().equals(id)){
-                System.out.println(app.toString());
-                return;
-            }
-        }
-        System.out.printf("FEL: Ingen bokning med detta personnummer hittades.");
-    }
-    private static void findDate(String date) {
-        for (Appointment app : appointments){
-            if (app.getDate().equals(date)){
-                System.out.println(app.toString());
-                return;
-            }
-        }
-        System.out.printf("FEL: Ingen bokning hittades på det sökta datumet %s.%n", date);
-    }
-
-    private static void addAppointment() {
-        try {
-            String name = input.readString("Ange fullständigt namn: ");
-            String idNumber = input.readString("\nAnge ditt 10-siffriga personnummer: ");
-            String email = input.readString("\nAnge e-postadress: ");
-            String date = input.readString("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD): ");
-            String time = input.readString("\nAnge tid för mötet med format (HH:MM): ");
-            String description = input.readString("\nAnge en beskrivning av mötet: ");
-/*
-*Allows accumulation of errors while inputing
- */
-            validateName(name);
-            validateIdNumber(idNumber,new ArrayList<>());
-            validateEmail(email,new ArrayList<>());
-            validateDate(date,new ArrayList<>());
-            validateTime(time,new ArrayList<>());
-            validateDescription(description,new ArrayList<>());
-
-            Appointment newAppointment = new Appointment(
-                    generateUniqueId(),
-                    name,
-                    idNumber,
-                    email,
-                    date,
-                    time,
-                    description
-            );
-
-            appointments.add(newAppointment);
-
-            System.out.println("\nDitt möte har lagts till framgångsrikt!\n");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Fel: " + e.getMessage());
-        }
-    }
-
-    private static void validateName(String name) {
-    }
-
-    private static void deleteAppointment() {
-        try {
-            int option;
-            do {
-                System.out.println("Välj alternativ för att ta bort möte:");
-                System.out.println("1. Ange namn");
-                System.out.println("2. Ange personnummer");
-                System.out.println("3. Ange datum");
-                System.out.println("4. Radera alla möten");
-                System.out.println("5. Gå tillbaka till huvudmenyn");
-                option = input.readInt("");
+        while (!exitUpdateMenu) {
+            try {
+                System.out.println("Välj alternativ för uppdatering:");
+                System.out.println("1. Uppdatera efter namn");
+                System.out.println("2. Uppdatera efter personnummer");
+                System.out.println("3. Uppdatera efter datum");
+                System.out.println("4. Gå tillbaka till huvudmenyn");
+                int option = inputReader.nextInt();
 
                 switch (option) {
+                    case 1, 2, 3 -> updateRecordByField(getUpdateFieldByOption(option));
+                    case 4 -> {
+                        System.out.println("Återgår till huvudmenyn...");
+                        exitUpdateMenu = true;
+                    }
+                    default -> System.out.println("Felaktigt alternativ. Var vänlig försök igen.");
+                }
+
+                if (option != 4) {
+                    // Om användaren inte valde att återgå till huvudmenyn, fråga om fortsättning i uppdateringskontexten
+                    exitUpdateMenu = !askForContinue("uppdatering");
+                }
+
+            } catch (InputMismatchException e) {
+                System.out.println("Fel: Ange ett giltigt alternativ.");
+                inputReader.nextLine();
+            }
+        }
+    }
+
+    private static String getUpdateFieldByOption(int option) {
+        switch (option) {
+            case 1 -> {
+                return FIELD_NAME;
+            }
+            case 2 -> {
+                return FIELD_ID_NUMBER;
+            }
+            case 3 -> {
+                return FIELD_DATE;
+            }
+            default -> throw new IllegalArgumentException("Ogiltigt alternativ för uppdatering.");
+        }
+    }
+
+    private static void updateRecordByField(String field) {
+        try {
+            System.out.println("Ange det befintliga värdet för " + appointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
+            String oldValue = inputReader.next();
+
+            // Konsumera resten av raden
+            inputReader.nextLine();
+
+            Appointment newAppointment = createAppointmentFromUserInput();
+
+            // Anropa updateRecord-metoden i appointmentRepository
+            appointmentRepository.updateRecord(field, oldValue, newAppointment);
+
+        } catch (InputMismatchException e) {
+            System.out.println("Fel: Ange giltiga data.");
+            inputReader.nextLine();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Appointment createAppointmentFromUserInput() {
+        System.out.println("Ange nytt namn:");
+        String newName = inputReader.nextLine();
+
+        System.out.println("Ange nytt 10-siffrigt personnummer:");
+        String newIdNumber = inputReader.nextLine();
+
+        System.out.println("Ange ny e-postadress:");
+        String newEmail = inputReader.nextLine();
+
+        System.out.println("Ange nytt datum för mötet:");
+        String newDate = inputReader.nextLine();
+
+        System.out.println("Ange ny tid för mötet:");
+        String newTime = inputReader.nextLine();
+
+        System.out.println("Ange ny beskrivning av mötet:");
+        String newDescription = inputReader.nextLine();
+
+        // Skapa och returnera en ny Appointment-objekt med den insamlade informationen
+        return new Appointment(newName, newIdNumber, newEmail, newDate, newTime, newDescription);
+    }
+
+    private static boolean askForContinue(String context) {
+        System.out.println("Vill du fortsätta " + context + "? (ja/nej)");
+        String response = inputReader.next().toLowerCase();
+
+        if (response.equals("nej")) {
+            System.out.println("Återgår till huvudmenyn...");
+            return false;
+        } else if (!response.equals("ja")) {
+            System.out.println("Ogiltigt svar. Återgår till huvudmenyn...");
+            return false;
+        }
+
+        // Om svaret är "ja", fortsätt i menyn
+        return true;
+    }
+
+    /**
+     * Huvudmeny för att ta bort möten. Användaren kan välja att ta bort efter namn, personnummer, datum, alla möten eller återgå till huvudmenyn.
+     */
+    static void deleteMenu() {
+        try {
+            while (true) {
+                System.out.println("Välj alternativ för att ta bort mötet:");
+                System.out.println("1 - Ta bort efter namn");
+                System.out.println("2 - Ta bort efter personnummer");
+                System.out.println("3 - Ta bort efter datum");
+                System.out.println("4 - Ta bort alla möten");
+                System.out.println("5 - Gå tillbaka till huvudmenyn");
+
+                int deleteOption = inputReader.nextInt();
+
+                switch (deleteOption) {
                     case 1:
-                        deleteByName();
+                        System.out.println("Ange namnet på mötet du vill ta bort:");
+                        String nameToDelete = inputReader.next();
+                        appointmentRepository.deleteAppointmentByName(nameToDelete);
                         break;
                     case 2:
-                        deleteByIdNumber();
+                        System.out.println("Ange personnummer för mötet du vill ta bort:");
+                        String idNumberToDelete = inputReader.next();
+                        appointmentRepository.deleteAppointmentByIdNumber(idNumberToDelete);
                         break;
                     case 3:
-                        deleteByDate();
+                        System.out.println("Ange datumet för mötet du vill ta bort:");
+                        String dateToDelete = inputReader.next();
+                        appointmentRepository.deleteAppointmentByDate(dateToDelete);
                         break;
                     case 4:
-                        deleteAllAppointments();
+                        if (appointmentRepository.getRecordCount() == 0) {
+                            System.out.println("Inga möten att ta bort.");
+                            continue;
+                        }
+                        appointmentRepository.deleteAllRecords();
                         break;
                     case 5:
-                        System.out.println("Återgår till huvudmenyn.");
-                        break;
+                        return;
                     default:
-                        System.out.println("Ogiltigt alternativ. Försök igen.");
+                        System.out.println("Ogiltigt alternativ.");
+                        break;
                 }
-            } while (option != 5);
+
+                if (deleteOption != 5 && appointmentRepository.getRecordCount() > 0) {
+                    if (!askForContinue("borttagning")) {
+                        return; // Om användaren inte vill fortsätta, återgå till huvudmenyn
+                    }
+                }
+            }
         } catch (InputMismatchException e) {
-            System.out.println("Fel: Ange en giltig siffra.");
-            input.readInt("");
+            System.out.println("Fel: Ange ett giltigt alternativ");
+            inputReader.nextLine();
         }
     }
-    private static void deleteByName() {
-        String appointmentName = input.readString("Ange namnet för mötet du vill ta bort: ");
-        appointments.removeIf(appointment -> appointment.getName().equalsIgnoreCase(appointmentName));
-        System.out.println("Mötet med namnet '" + appointmentName + "' har tagits bort.");
-    }
-    private static void deleteByIdNumber() {
+
+    /**
+     * Visar alla möten i systemet.
+     */
+    static void showAppointments() {
         try {
-            String appointmentIdNumber = input.readString("Ange personnumret som är kopplat till mötet du vill ta bort:");
-
-            boolean removed = appointments.removeIf(appointment -> appointment.getIdNumber().equals(appointmentIdNumber));
-
-            if (removed) {
-                System.out.println("Mötet med personnumret" + appointmentIdNumber + " har tagits bort.");
-            } else {
-                System.out.println("Inget möte hittades med personnumret " + appointmentIdNumber);
-            }
-        } catch (InputMismatchException e) {
-            System.out.println("Fel: Ange ett giltigt personnummer.");
-            input.readInt("");
+            appointmentRepository.showRecords();
+        } catch (SQLException e) {
+            System.err.println("Fel vid visning av möten: " + e.getMessage());
+            e.printStackTrace();
         }
-    }
-
-    private static void deleteByDate() {
-        String appointmentDate = input.readString("Ange datumet för mötet du vill ta bort: ");
-
-        appointments.removeIf(appointment -> appointment.getDate().equalsIgnoreCase(appointmentDate));
-
-        System.out.println("Möten med datumet '" + appointmentDate + "' har tagits bort.");
-    }
-
-    private static void deleteAllAppointments() {
-        String confirmation = input.readString("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
-
-        if (confirmation.equalsIgnoreCase("ja")) {
-            appointments.clear();
-            System.out.println("Alla möten har raderats.");
-        } else {
-            System.out.println("Radering av alla möten avbruten.");
-        }
-    }
-
-    private static void printAppointmentDetails(Appointment appointment) {
-        System.out.println("Mötet med följande detaljer hittades:");
-        System.out.println("ID: " + appointment.getId());
-        System.out.println("Namn: " + appointment.getName());
-        System.out.println("Personnummer: " + appointment.getIdNumber());
-        System.out.println("E-postadress: " + appointment.getEmail());
-        System.out.println("Datum: " + appointment.getDate());
-        System.out.println("Tid: " + appointment.getTime());
-        System.out.println("Beskrivning: " + appointment.getDescription());
-        System.out.println("------------------------------------------------------------");
-    }
-
-    private static void showAllAppointments() {
-        if (appointments.isEmpty()) {
-            System.out.println("Inga möten är schemalagda för närvarande.");
-        } else {
-            for (Appointment appointment : appointments) {
-                printAppointmentDetails(appointment);
-            }
-        }
-    }
-    private static int generateUniqueId() {
-        return idCounter.getAndIncrement();
-
-
-    }
-
-
-    //Denna är bara tilllagd som test för att altid ha peroner i listan.
-    //Ska tas bort till redovisningen.
-    private static void load(){
-        Appointment app1 = new Appointment(1234, "app1", "1212121212", "mattias@outlook.com", "2025-12-12", "15:30", "bokning1");
-        appointments.add(app1);
-        Appointment app2 = new Appointment(4242, "app2", "5252525252", "mattias@hotmail.com", "2024-12-12", "15:35", "bokning2");
-        appointments.add(app2);
     }
 }
