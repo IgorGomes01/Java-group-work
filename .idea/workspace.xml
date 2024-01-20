@@ -4,8 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Updated the validation methods. added comments on changes.">
+    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="1.1 Design och visning av huvudmeny">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/DatabaseManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/UserInterface.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/InputReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/InputReader.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +45,11 @@
   "keyToString": {
     "Application.Appointment.executor": "Run",
     "Application.AppointmentAgenda.executor": "Run",
+    "Maven.Javagroupwork [clean].executor": "Run",
+    "Maven.Javagroupwork [compile].executor": "Run",
+    "Maven.Javagroupwork [install].executor": "Run",
+    "Maven.Javagroupwork [test].executor": "Run",
+    "Maven.Javagroupwork [validate].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
