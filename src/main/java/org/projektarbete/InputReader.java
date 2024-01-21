@@ -61,4 +61,3 @@ public class InputReader implements AutoCloseable {
         closeScanner();
     }
 }
-
