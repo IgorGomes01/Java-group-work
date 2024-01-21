@@ -1,0 +1,1576 @@
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n    <modelVersion>4.0.0</modelVersion>\r\n\r\n    <groupId>org.example</groupId>\r\n    <artifactId>Javagroupwork</artifactId>\r\n    <version>1.0-SNAPSHOT</version>\r\n\r\n    <properties>\r\n        <maven.compiler.source>21</maven.compiler.source>\r\n        <maven.compiler.target>21</maven.compiler.target>\r\n        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\r\n    </properties>\r\n\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision c992bb0909e61c73c8576f9ddbe01772feac3345)
++++ b/pom.xml	(date 1705678214893)
+@@ -1,4 +1,3 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+ <project xmlns="http://maven.apache.org/POM/4.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+@@ -14,4 +13,16 @@
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+ 
+-</project>
+\ No newline at end of file
++    <dependencies>
++        <!-- Other dependencies -->
++        <dependency>
++            <groupId>com.microsoft.sqlserver</groupId>
++            <artifactId>mssql-jdbc</artifactId>
++            <version>12.4.2.jre8</version> <!-- or the appropriate version -->
++        </dependency>
++    </dependencies>
++
++
++
++
++</project>
+Index: src/main/java/org/projektarbete/AppointmentAgenda.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.projektarbete;\r\nimport java.sql.SQLOutput;\r\nimport java.util.InputMismatchException;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.concurrent.atomic.AtomicInteger;\r\n\r\nimport static org.projektarbete.Appointment.*;\r\n\r\npublic class AppointmentAgenda {\r\n\r\n    private static final InputReader input = new InputReader();\r\n    private static final List<Appointment> appointments = new ArrayList<>();\r\n    private static final AtomicInteger idCounter = new AtomicInteger(1);\r\n\r\n    private static final int ADD_APPOINTMENT_OPTION = 1;\r\n    private static final int SEARCH_APPOINTMENT_OPTION = 2;\r\n    private static final int UPDATE_APPOINTMENT_OPTION = 3;\r\n    private static final int DELETE_APPOINTMENT_OPTION = 4;\r\n    private static final int SHOW_ALL_APPOINTMENTS_OPTION = 5;\r\n    private static final int EXIT_OPTION = 6;\r\n\r\n    public static void main(String[] args) {\r\n        load();\r\n        mainMenuOptions();\r\n    }\r\n\r\n    private static void mainMenuOptions() {\r\n        int option;\r\n\r\n        do {\r\n            displayMainMenu();\r\n\r\n            while (true) {\r\n                try {\r\n                    option = input.readInt(\"Ange val\");\r\n                    break;\r\n                } catch (InputMismatchException e) {\r\n                    System.out.println(\"Var god ange ett giltigt heltal.\");\r\n                }\r\n            }\r\n\r\n            processMainMenuOption(option);\r\n\r\n        } while (option != EXIT_OPTION);\r\n    }\r\n\r\n    private static void displayMainMenu() {\r\n        System.out.println(\"------------------------------------------------------------\");\r\n        System.out.println(\"                       MÖTESCHEMA\");\r\n        System.out.println(\"------------------------------------------------------------\\n\");\r\n\r\n        System.out.println(\" ANGE ETT ALTERNATIV\\n\");\r\n        System.out.println(\" \" + ADD_APPOINTMENT_OPTION + \" - LÄGG TILL NYTT MÖTE\");\r\n        System.out.println(\" \" + SEARCH_APPOINTMENT_OPTION + \" - SÖK MÖTE\");\r\n        System.out.println(\" \" + UPDATE_APPOINTMENT_OPTION + \" - UPPDATERA MÖTE\");\r\n        System.out.println(\" \" + DELETE_APPOINTMENT_OPTION + \" - TA BORT MÖTE\");\r\n        System.out.println(\" \" + SHOW_ALL_APPOINTMENTS_OPTION + \" - VISA ALLA MÖTEN\");\r\n        System.out.println(\" \" + EXIT_OPTION + \" - AVSLUTA PROGRAMMET\");\r\n        System.out.println(\"------------------------------------------------------------\\n\");\r\n    }\r\n\r\n    private static void processMainMenuOption(int option) {\r\n        switch (option) {\r\n            case ADD_APPOINTMENT_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                     Lägg till nytt möte\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                addAppointment();\r\n                break;\r\n            case SEARCH_APPOINTMENT_OPTION:\r\n                System.out.println(\"\\n------------------------------------------------------------\");\r\n                System.out.println(\"                         Söker...\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                searchAppointment();\r\n                System.out.println(\"\\n------------------------------------------------------------\");\r\n                System.out.println(\"                    Slutet på sökningen\");\r\n                System.out.println(\"------------------------------------------------------------\\n\\n\");\r\n                break;\r\n            case UPDATE_APPOINTMENT_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                     Uppdatera möte\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                updateAppointment();\r\n                break;\r\n            case DELETE_APPOINTMENT_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                    Ta bort möte\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                deleteAppointment();\r\n                break;\r\n            case SHOW_ALL_APPOINTMENTS_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                    Schemalagda möten\");\r\n                System.out.println(\"------------------------------------------------------------\\n\\n\");\r\n                showAllAppointments();\r\n                System.out.println(\"\\n------------------------------------------------------------\");\r\n                System.out.println(\"                      Slut på samråd\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                break;\r\n            case EXIT_OPTION:\r\n                System.out.println(\"Avslutar programmet. Adjö!\");\r\n                break;\r\n            default:\r\n                System.out.println(\"Ogiltigt alternativ\");\r\n                break;\r\n        }\r\n    }\r\n    //Har bara gjort själva menyn\r\n    private static void printUpdateAppointmentmenu(){\r\n        System.out.println(\"1: Uppdatera namn \");\r\n        System.out.println(\"2: Uppdatera personnummer \");\r\n        System.out.println(\"3: Uppdatera E-post\");\r\n        System.out.println(\"4: Uppdatera datum\");\r\n        System.out.println(\"5: Uppdatera tid\");\r\n        System.out.println(\"6: Uppdatera beskrivning\");\r\n        System.out.println(\"7: Återgå till huvudmenyn\");\r\n    }\r\n    //Visar menyn\r\n    private static void updateAppointment() {\r\n        printUpdateAppointmentmenu();\r\n\r\n    }\r\n\r\n    //Visar menyn för att söka efter möten\r\n    private static void printFindAppointmentsMenu() {\r\n        //MENY SOM SKA PRINTAS\r\n        System.out.println(\"1: Sök efter namn \");\r\n        System.out.println(\"2: Sök efter personnummer \");\r\n        System.out.println(\"3: Sök efter datum\");\r\n        System.out.println(\"4: Återgå till huvudmenyn\");\r\n    }\r\n\r\n    //Själva valen för sökning av respektive namn, personnummer, datum.\r\n    private static void appointmentChoice() {\r\n\r\n        int option = input.readInt(\"Ange val>\");\r\n\r\n        switch (option) {\r\n            case 1:\r\n                String name = input.readString(\"Sök efter namn: \");\r\n                findName(name);\r\n                break;\r\n\r\n            case 2:\r\n                System.out.println(\"Sök efter 10-siffrigt personnummer: \");\r\n                String idNumber;\r\n                do {\r\n                    idNumber = input.readString(\"\");\r\n                    if (idNumber.length()!= 10){\r\n                        System.out.println(\"FEL: OBS personnummret måste vara 10 siffror långt\");\r\n                    }\r\n                }while (idNumber.length()!= 10);\r\n                findSSNumber(idNumber);\r\n                break;\r\n\r\n            case 3:\r\n                String date = input.readString(\"Sök efter datum: \");\r\n                findDate(date);\r\n                break;\r\n        }\r\n    }\r\n\r\n    private static void searchAppointment(){\r\n        printFindAppointmentsMenu();\r\n        appointmentChoice();\r\n    }\r\n\r\n    private static void findName(String s) {\r\n        for (Appointment app : appointments){\r\n            if (app.getName().equals(s)){\r\n                System.out.println(app.toString());\r\n                return;\r\n            }\r\n        }\r\n        System.out.println(\"FEL: Ingen bokning i detta namnet hittades.\");\r\n    }\r\n    private static void findSSNumber(String id) {\r\n        for (Appointment app : appointments){\r\n            if (app.getIdNumber().equals(id)){\r\n                System.out.println(app.toString());\r\n                return;\r\n            }\r\n        }\r\n        System.out.printf(\"FEL: Ingen bokning med detta personnummer hittades.\");\r\n    }\r\n    private static void findDate(String date) {\r\n        for (Appointment app : appointments){\r\n            if (app.getDate().equals(date)){\r\n                System.out.println(app.toString());\r\n                return;\r\n            }\r\n        }\r\n        System.out.printf(\"FEL: Ingen bokning hittades på det sökta datumet %s.%n\", date);\r\n    }\r\n\r\n    private static void addAppointment() {\r\n        try {\r\n            String name = input.readString(\"Ange fullständigt namn: \");\r\n            String idNumber = input.readString(\"\\nAnge ditt 10-siffriga personnummer: \");\r\n            String email = input.readString(\"\\nAnge e-postadress: \");\r\n            String date = input.readString(\"\\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD): \");\r\n            String time = input.readString(\"\\nAnge tid för mötet med format (HH:MM): \");\r\n            String description = input.readString(\"\\nAnge en beskrivning av mötet: \");\r\n/*\r\n*Allows accumulation of errors while inputing\r\n */\r\n            validateName(name);\r\n            validateIdNumber(idNumber,new ArrayList<>());\r\n            validateEmail(email,new ArrayList<>());\r\n            validateDate(date,new ArrayList<>());\r\n            validateTime(time,new ArrayList<>());\r\n            validateDescription(description,new ArrayList<>());\r\n\r\n            Appointment newAppointment = new Appointment(\r\n                    generateUniqueId(),\r\n                    name,\r\n                    idNumber,\r\n                    email,\r\n                    date,\r\n                    time,\r\n                    description\r\n            );\r\n\r\n            appointments.add(newAppointment);\r\n\r\n            System.out.println(\"\\nDitt möte har lagts till framgångsrikt!\\n\");\r\n        } catch (IllegalArgumentException e) {\r\n            System.out.println(\"Fel: \" + e.getMessage());\r\n        }\r\n    }\r\n\r\n    private static void validateName(String name) {\r\n    }\r\n\r\n    private static void deleteAppointment() {\r\n        try {\r\n            int option;\r\n            do {\r\n                System.out.println(\"Välj alternativ för att ta bort möte:\");\r\n                System.out.println(\"1. Ange namn\");\r\n                System.out.println(\"2. Ange personnummer\");\r\n                System.out.println(\"3. Ange datum\");\r\n                System.out.println(\"4. Radera alla möten\");\r\n                System.out.println(\"5. Gå tillbaka till huvudmenyn\");\r\n                option = input.readInt(\"\");\r\n\r\n                switch (option) {\r\n                    case 1:\r\n                        deleteByName();\r\n                        break;\r\n                    case 2:\r\n                        deleteByIdNumber();\r\n                        break;\r\n                    case 3:\r\n                        deleteByDate();\r\n                        break;\r\n                    case 4:\r\n                        deleteAllAppointments();\r\n                        break;\r\n                    case 5:\r\n                        System.out.println(\"Återgår till huvudmenyn.\");\r\n                        break;\r\n                    default:\r\n                        System.out.println(\"Ogiltigt alternativ. Försök igen.\");\r\n                }\r\n            } while (option != 5);\r\n        } catch (InputMismatchException e) {\r\n            System.out.println(\"Fel: Ange en giltig siffra.\");\r\n            input.readInt(\"\");\r\n        }\r\n    }\r\n    private static void deleteByName() {\r\n        String appointmentName = input.readString(\"Ange namnet för mötet du vill ta bort: \");\r\n        appointments.removeIf(appointment -> appointment.getName().equalsIgnoreCase(appointmentName));\r\n        System.out.println(\"Mötet med namnet '\" + appointmentName + \"' har tagits bort.\");\r\n    }\r\n    private static void deleteByIdNumber() {\r\n        try {\r\n            String appointmentIdNumber = input.readString(\"Ange personnumret som är kopplat till mötet du vill ta bort:\");\r\n\r\n            boolean removed = appointments.removeIf(appointment -> appointment.getIdNumber().equals(appointmentIdNumber));\r\n\r\n            if (removed) {\r\n                System.out.println(\"Mötet med personnumret\" + appointmentIdNumber + \" har tagits bort.\");\r\n            } else {\r\n                System.out.println(\"Inget möte hittades med personnumret \" + appointmentIdNumber);\r\n            }\r\n        } catch (InputMismatchException e) {\r\n            System.out.println(\"Fel: Ange ett giltigt personnummer.\");\r\n            input.readInt(\"\");\r\n        }\r\n    }\r\n\r\n    private static void deleteByDate() {\r\n        String appointmentDate = input.readString(\"Ange datumet för mötet du vill ta bort: \");\r\n\r\n        appointments.removeIf(appointment -> appointment.getDate().equalsIgnoreCase(appointmentDate));\r\n\r\n        System.out.println(\"Möten med datumet '\" + appointmentDate + \"' har tagits bort.\");\r\n    }\r\n\r\n    private static void deleteAllAppointments() {\r\n        String confirmation = input.readString(\"Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):\");\r\n\r\n        if (confirmation.equalsIgnoreCase(\"ja\")) {\r\n            appointments.clear();\r\n            System.out.println(\"Alla möten har raderats.\");\r\n        } else {\r\n            System.out.println(\"Radering av alla möten avbruten.\");\r\n        }\r\n    }\r\n\r\n    private static void printAppointmentDetails(Appointment appointment) {\r\n        System.out.println(\"Mötet med följande detaljer hittades:\");\r\n        System.out.println(\"ID: \" + appointment.getId());\r\n        System.out.println(\"Namn: \" + appointment.getName());\r\n        System.out.println(\"Personnummer: \" + appointment.getIdNumber());\r\n        System.out.println(\"E-postadress: \" + appointment.getEmail());\r\n        System.out.println(\"Datum: \" + appointment.getDate());\r\n        System.out.println(\"Tid: \" + appointment.getTime());\r\n        System.out.println(\"Beskrivning: \" + appointment.getDescription());\r\n        System.out.println(\"------------------------------------------------------------\");\r\n    }\r\n\r\n    private static void showAllAppointments() {\r\n        if (appointments.isEmpty()) {\r\n            System.out.println(\"Inga möten är schemalagda för närvarande.\");\r\n        } else {\r\n            for (Appointment appointment : appointments) {\r\n                printAppointmentDetails(appointment);\r\n            }\r\n        }\r\n    }\r\n    private static int generateUniqueId() {\r\n        return idCounter.getAndIncrement();\r\n\r\n\r\n    }\r\n\r\n\r\n    //Denna är bara tilllagd som test för att altid ha peroner i listan.\r\n    //Ska tas bort till redovisningen.\r\n    private static void load(){\r\n        Appointment app1 = new Appointment(1234, \"app1\", \"1212121212\", \"mattias@outlook.com\", \"2025-12-12\", \"15:30\", \"bokning1\");\r\n        appointments.add(app1);\r\n        Appointment app2 = new Appointment(4242, \"app2\", \"5252525252\", \"mattias@hotmail.com\", \"2024-12-12\", \"15:35\", \"bokning2\");\r\n        appointments.add(app2);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/AppointmentAgenda.java b/src/main/java/org/projektarbete/AppointmentAgenda.java
+--- a/src/main/java/org/projektarbete/AppointmentAgenda.java	(revision c992bb0909e61c73c8576f9ddbe01772feac3345)
++++ b/src/main/java/org/projektarbete/AppointmentAgenda.java	(date 1705678265270)
+@@ -1,18 +1,10 @@
+ package org.projektarbete;
+-import java.sql.SQLOutput;
+ import java.util.InputMismatchException;
+-import java.util.ArrayList;
+-import java.util.List;
+-import java.util.concurrent.atomic.AtomicInteger;
+-
+-import static org.projektarbete.Appointment.*;
++import java.util.Scanner;
+ 
+ public class AppointmentAgenda {
+ 
+-    private static final InputReader input = new InputReader();
+-    private static final List<Appointment> appointments = new ArrayList<>();
+-    private static final AtomicInteger idCounter = new AtomicInteger(1);
+-
++    private static final Scanner scanner = new Scanner(System.in);
+     private static final int ADD_APPOINTMENT_OPTION = 1;
+     private static final int SEARCH_APPOINTMENT_OPTION = 2;
+     private static final int UPDATE_APPOINTMENT_OPTION = 3;
+@@ -21,7 +13,6 @@
+     private static final int EXIT_OPTION = 6;
+ 
+     public static void main(String[] args) {
+-        load();
+         mainMenuOptions();
+     }
+ 
+@@ -33,10 +24,12 @@
+ 
+             while (true) {
+                 try {
+-                    option = input.readInt("Ange val");
++                    option = scanner.nextInt();
++                    scanner.nextLine();
+                     break;
+                 } catch (InputMismatchException e) {
+                     System.out.println("Var god ange ett giltigt heltal.");
++                    scanner.nextLine();
+                 }
+             }
+ 
+@@ -66,13 +59,11 @@
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                     Lägg till nytt möte");
+                 System.out.println("------------------------------------------------------------\n");
+-                addAppointment();
+                 break;
+             case SEARCH_APPOINTMENT_OPTION:
+                 System.out.println("\n------------------------------------------------------------");
+                 System.out.println("                         Söker...");
+                 System.out.println("------------------------------------------------------------\n");
+-                searchAppointment();
+                 System.out.println("\n------------------------------------------------------------");
+                 System.out.println("                    Slutet på sökningen");
+                 System.out.println("------------------------------------------------------------\n\n");
+@@ -81,19 +72,16 @@
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                     Uppdatera möte");
+                 System.out.println("------------------------------------------------------------\n");
+-                updateAppointment();
+                 break;
+             case DELETE_APPOINTMENT_OPTION:
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                    Ta bort möte");
+                 System.out.println("------------------------------------------------------------\n");
+-                deleteAppointment();
+                 break;
+             case SHOW_ALL_APPOINTMENTS_OPTION:
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                    Schemalagda möten");
+                 System.out.println("------------------------------------------------------------\n\n");
+-                showAllAppointments();
+                 System.out.println("\n------------------------------------------------------------");
+                 System.out.println("                      Slut på samråd");
+                 System.out.println("------------------------------------------------------------\n");
+@@ -105,246 +93,5 @@
+                 System.out.println("Ogiltigt alternativ");
+                 break;
+         }
+-    }
+-    //Har bara gjort själva menyn
+-    private static void printUpdateAppointmentmenu(){
+-        System.out.println("1: Uppdatera namn ");
+-        System.out.println("2: Uppdatera personnummer ");
+-        System.out.println("3: Uppdatera E-post");
+-        System.out.println("4: Uppdatera datum");
+-        System.out.println("5: Uppdatera tid");
+-        System.out.println("6: Uppdatera beskrivning");
+-        System.out.println("7: Återgå till huvudmenyn");
+-    }
+-    //Visar menyn
+-    private static void updateAppointment() {
+-        printUpdateAppointmentmenu();
+-
+-    }
+-
+-    //Visar menyn för att söka efter möten
+-    private static void printFindAppointmentsMenu() {
+-        //MENY SOM SKA PRINTAS
+-        System.out.println("1: Sök efter namn ");
+-        System.out.println("2: Sök efter personnummer ");
+-        System.out.println("3: Sök efter datum");
+-        System.out.println("4: Återgå till huvudmenyn");
+-    }
+-
+-    //Själva valen för sökning av respektive namn, personnummer, datum.
+-    private static void appointmentChoice() {
+-
+-        int option = input.readInt("Ange val>");
+-
+-        switch (option) {
+-            case 1:
+-                String name = input.readString("Sök efter namn: ");
+-                findName(name);
+-                break;
+-
+-            case 2:
+-                System.out.println("Sök efter 10-siffrigt personnummer: ");
+-                String idNumber;
+-                do {
+-                    idNumber = input.readString("");
+-                    if (idNumber.length()!= 10){
+-                        System.out.println("FEL: OBS personnummret måste vara 10 siffror långt");
+-                    }
+-                }while (idNumber.length()!= 10);
+-                findSSNumber(idNumber);
+-                break;
+-
+-            case 3:
+-                String date = input.readString("Sök efter datum: ");
+-                findDate(date);
+-                break;
+-        }
+-    }
+-
+-    private static void searchAppointment(){
+-        printFindAppointmentsMenu();
+-        appointmentChoice();
+-    }
+-
+-    private static void findName(String s) {
+-        for (Appointment app : appointments){
+-            if (app.getName().equals(s)){
+-                System.out.println(app.toString());
+-                return;
+-            }
+-        }
+-        System.out.println("FEL: Ingen bokning i detta namnet hittades.");
+-    }
+-    private static void findSSNumber(String id) {
+-        for (Appointment app : appointments){
+-            if (app.getIdNumber().equals(id)){
+-                System.out.println(app.toString());
+-                return;
+-            }
+-        }
+-        System.out.printf("FEL: Ingen bokning med detta personnummer hittades.");
+-    }
+-    private static void findDate(String date) {
+-        for (Appointment app : appointments){
+-            if (app.getDate().equals(date)){
+-                System.out.println(app.toString());
+-                return;
+-            }
+-        }
+-        System.out.printf("FEL: Ingen bokning hittades på det sökta datumet %s.%n", date);
+-    }
+-
+-    private static void addAppointment() {
+-        try {
+-            String name = input.readString("Ange fullständigt namn: ");
+-            String idNumber = input.readString("\nAnge ditt 10-siffriga personnummer: ");
+-            String email = input.readString("\nAnge e-postadress: ");
+-            String date = input.readString("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD): ");
+-            String time = input.readString("\nAnge tid för mötet med format (HH:MM): ");
+-            String description = input.readString("\nAnge en beskrivning av mötet: ");
+-/*
+-*Allows accumulation of errors while inputing
+- */
+-            validateName(name);
+-            validateIdNumber(idNumber,new ArrayList<>());
+-            validateEmail(email,new ArrayList<>());
+-            validateDate(date,new ArrayList<>());
+-            validateTime(time,new ArrayList<>());
+-            validateDescription(description,new ArrayList<>());
+-
+-            Appointment newAppointment = new Appointment(
+-                    generateUniqueId(),
+-                    name,
+-                    idNumber,
+-                    email,
+-                    date,
+-                    time,
+-                    description
+-            );
+-
+-            appointments.add(newAppointment);
+-
+-            System.out.println("\nDitt möte har lagts till framgångsrikt!\n");
+-        } catch (IllegalArgumentException e) {
+-            System.out.println("Fel: " + e.getMessage());
+-        }
+-    }
+-
+-    private static void validateName(String name) {
+-    }
+-
+-    private static void deleteAppointment() {
+-        try {
+-            int option;
+-            do {
+-                System.out.println("Välj alternativ för att ta bort möte:");
+-                System.out.println("1. Ange namn");
+-                System.out.println("2. Ange personnummer");
+-                System.out.println("3. Ange datum");
+-                System.out.println("4. Radera alla möten");
+-                System.out.println("5. Gå tillbaka till huvudmenyn");
+-                option = input.readInt("");
+-
+-                switch (option) {
+-                    case 1:
+-                        deleteByName();
+-                        break;
+-                    case 2:
+-                        deleteByIdNumber();
+-                        break;
+-                    case 3:
+-                        deleteByDate();
+-                        break;
+-                    case 4:
+-                        deleteAllAppointments();
+-                        break;
+-                    case 5:
+-                        System.out.println("Återgår till huvudmenyn.");
+-                        break;
+-                    default:
+-                        System.out.println("Ogiltigt alternativ. Försök igen.");
+-                }
+-            } while (option != 5);
+-        } catch (InputMismatchException e) {
+-            System.out.println("Fel: Ange en giltig siffra.");
+-            input.readInt("");
+-        }
+-    }
+-    private static void deleteByName() {
+-        String appointmentName = input.readString("Ange namnet för mötet du vill ta bort: ");
+-        appointments.removeIf(appointment -> appointment.getName().equalsIgnoreCase(appointmentName));
+-        System.out.println("Mötet med namnet '" + appointmentName + "' har tagits bort.");
+-    }
+-    private static void deleteByIdNumber() {
+-        try {
+-            String appointmentIdNumber = input.readString("Ange personnumret som är kopplat till mötet du vill ta bort:");
+-
+-            boolean removed = appointments.removeIf(appointment -> appointment.getIdNumber().equals(appointmentIdNumber));
+-
+-            if (removed) {
+-                System.out.println("Mötet med personnumret" + appointmentIdNumber + " har tagits bort.");
+-            } else {
+-                System.out.println("Inget möte hittades med personnumret " + appointmentIdNumber);
+-            }
+-        } catch (InputMismatchException e) {
+-            System.out.println("Fel: Ange ett giltigt personnummer.");
+-            input.readInt("");
+-        }
+-    }
+-
+-    private static void deleteByDate() {
+-        String appointmentDate = input.readString("Ange datumet för mötet du vill ta bort: ");
+-
+-        appointments.removeIf(appointment -> appointment.getDate().equalsIgnoreCase(appointmentDate));
+-
+-        System.out.println("Möten med datumet '" + appointmentDate + "' har tagits bort.");
+-    }
+-
+-    private static void deleteAllAppointments() {
+-        String confirmation = input.readString("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
+-
+-        if (confirmation.equalsIgnoreCase("ja")) {
+-            appointments.clear();
+-            System.out.println("Alla möten har raderats.");
+-        } else {
+-            System.out.println("Radering av alla möten avbruten.");
+-        }
+-    }
+-
+-    private static void printAppointmentDetails(Appointment appointment) {
+-        System.out.println("Mötet med följande detaljer hittades:");
+-        System.out.println("ID: " + appointment.getId());
+-        System.out.println("Namn: " + appointment.getName());
+-        System.out.println("Personnummer: " + appointment.getIdNumber());
+-        System.out.println("E-postadress: " + appointment.getEmail());
+-        System.out.println("Datum: " + appointment.getDate());
+-        System.out.println("Tid: " + appointment.getTime());
+-        System.out.println("Beskrivning: " + appointment.getDescription());
+-        System.out.println("------------------------------------------------------------");
+-    }
+-
+-    private static void showAllAppointments() {
+-        if (appointments.isEmpty()) {
+-            System.out.println("Inga möten är schemalagda för närvarande.");
+-        } else {
+-            for (Appointment appointment : appointments) {
+-                printAppointmentDetails(appointment);
+-            }
+-        }
+-    }
+-    private static int generateUniqueId() {
+-        return idCounter.getAndIncrement();
+-
+-
+-    }
+-
+-
+-    //Denna är bara tilllagd som test för att altid ha peroner i listan.
+-    //Ska tas bort till redovisningen.
+-    private static void load(){
+-        Appointment app1 = new Appointment(1234, "app1", "1212121212", "mattias@outlook.com", "2025-12-12", "15:30", "bokning1");
+-        appointments.add(app1);
+-        Appointment app2 = new Appointment(4242, "app2", "5252525252", "mattias@hotmail.com", "2024-12-12", "15:35", "bokning2");
+-        appointments.add(app2);
+     }
+ }
+Index: src/main/java/org/projektarbete/Appointment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.projektarbete;\r\nimport java.time.LocalDate;\r\nimport java.time.format.DateTimeFormatter;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n\r\npublic class Appointment {\r\n    private final int id;\r\n    private final String name;\r\n    private final String idNumber;\r\n    private final String email;\r\n    private final String date;\r\n    private final String time;\r\n    private final String description;\r\n\r\n    public Appointment(int id, String name, String idNumber, String email, String date, String time, String description) {\r\n        List<String> errorMessage = new ArrayList<>();\r\n        validateAppointmentInput(name, idNumber, email, date, time, description,errorMessage);\r\n        if (!errorMessage.isEmpty()){\r\n            throw new IllegalArgumentException(String.join(\"\\n\", errorMessage));\r\n        }\r\n        this.id = id;\r\n        this.name = name;\r\n        this.idNumber = idNumber;\r\n        this.email = email;\r\n        this.date = date;\r\n        this.time = time;\r\n        this.description = description;\r\n    }\r\n\r\n\r\n    /*\r\n    *Centralises all logic for validations\r\n    * Allows for checking of mutiple aspects of the appoinment input in one place\r\n     */\r\n    private static void validateAppointmentInput(String name, String idNumber, String email, String date, String time, String description,List<String> errorMessage) {\r\n        validateName(name,errorMessage);\r\n        validateIdNumber(idNumber,errorMessage);\r\n        validateEmail(email,errorMessage);\r\n        validateDate(date,errorMessage);\r\n        validateTime(time,errorMessage);\r\n        validateDescription(description,errorMessage);\r\n    }\r\n    /*\r\n    *Testing validations in appointment\r\n    * calling validateallfields from appointment\r\n    * hard coded some specific parameter such my name, id, example email\r\n    * if everything is correct format and nothing is empty we get a message confirming that it was succful\r\n    * otherwise we get it failed.\r\n     */\r\n    public  static void main (String[]args){\r\n        try {\r\n            Appointment.validateAllFields(\"Zion Awino\", \"1234567890\", \"awno.zion@gmail.com\", \"2024-01-17\", \"12:30\", \"Something\");\r\n            System.out.println(\"Validation successful\");\r\n        } catch (IllegalArgumentException e) {\r\n            System.out.println(\"Validation failed: \" + e.getMessage());\r\n        }\r\n    }\r\n/*\r\n*Initilize an empty arraylist to store error message\r\n* call the methods used for validation\r\n* it accumulates the error messages if an input fails/is in the wrong format\r\n* is the array is not empty joins all error messages\r\n */\r\n    static void validateAllFields(String name,String idNumber,String email, String date,String time, String description){\r\n        List<String> errorMessage = new ArrayList<>();\r\n\r\n        validateName(name, errorMessage);\r\n        validateEmail(email,errorMessage);\r\n        validateIdNumber(idNumber,errorMessage);\r\n        validateDate(date, errorMessage);\r\n        validateTime(time,errorMessage);\r\n        validateDescription(description,errorMessage);\r\n\r\n        if (!errorMessage.isEmpty()){\r\n            throw new IllegalArgumentException(String.join(\"\\n\",errorMessage));\r\n        }\r\n    }\r\n    // Validation methods with improved error messages and corrected return types\r\n    static void validateName(String name, List<String> errorMessage) {\r\n        if (name == null || name.trim().isEmpty()) {\r\n            errorMessage.add(\"Namn kan inte vara eller tomt\");\r\n        }\r\n    }\r\n    //we might not need this\r\n    static void validateIdNumber(String idNumber,List<String> errorMessage) {\r\n        if (idNumber == null || !idNumber.matches(\"\\\\d{10}\")) {\r\n            errorMessage.add(\"Ogiltigt personnummer. Ange 10 siffror\");\r\n        }\r\n    }\r\n\r\n//*Added that an email must end in a .com\r\n    //Checks the format of the email.\r\n    // it has to have a 'name', '@' sign and end with '.com'\r\n\r\n\r\n    static void validateEmail(String email,List <String> errorMessage) {\r\n        if (email == null || !email.matches(\"^[\\\\w.-]+@[\\\\w.-]+\\\\.[a-zA-Z]{2,}$\")) {\r\n            errorMessage.add(\"Ogiltig e-postadress.format måste blir namn@namn.com/.org/.net\");\r\n        }\r\n    }\r\n    // Checks so that the date is in the future and not in the past\r\n    //At the same time checks if it is the right format.\r\n    static void validateDate(String date, List <String> errorMessage) {\r\n        if (date == null || !date.matches(\"\\\\d{4}-\\\\d{2}-\\\\d{2}\")) {\r\n            errorMessage.add(\"Ogiltigt datumformat. Använd ÅÅÅÅ-MM-DD\");\r\n        } else {\r\n            LocalDate currentDate = LocalDate.now();\r\n            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(\"yyyy-MM-dd\");\r\n            LocalDate providedDate = LocalDate.parse(date, formatter);\r\n\r\n            if (providedDate.isBefore(currentDate)) {\r\n                errorMessage.add(\"Datumet måste blir i framtiden\");\r\n            }\r\n        }\r\n    }\r\n    //Checks if the right format for time has been typed\r\n    static void validateTime(String time,List <String> errorMessage) {\r\n        if (time == null || !time.matches(\"([01]?[0-9]|2[0-3]):[0-5][0-9]\")) {\r\n            errorMessage.add(\"Ogiltigt tidsformat. Använd HH:MM\");\r\n        }\r\n    }\r\n    //Checks if something has been typed or not.\r\n    static void validateDescription(String description,List <String> errorMessage) {\r\n        if (description == null || description.trim().isEmpty()) {\r\n            errorMessage.add(\"Beskrivning kan inte vara tom\");\r\n        }\r\n    }\r\n\r\n\r\n    // Getters\r\n    public int getId() {\r\n        return id;\r\n    }\r\n\r\n    public String getName() {\r\n        return name;\r\n    }\r\n\r\n    public String getIdNumber() {\r\n        return idNumber;\r\n    }\r\n\r\n    public String getEmail() {\r\n        return email;\r\n    }\r\n\r\n    public String getDate() {\r\n        return date;\r\n    }\r\n\r\n    public String getTime() {\r\n        return time;\r\n    }\r\n\r\n    public String getDescription() {\r\n        return description;\r\n    }\r\n\r\n    public String toString(){\r\n        return \"Namn:\\t%s%nPersonnummer:\\t%s%nE-post:\\t%s%nDatum:\\t%s%nTid:\\t%s%nBeskrivning:\\t%s%n\".formatted(name, idNumber,email,date,time,description);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/Appointment.java b/src/main/java/org/projektarbete/Appointment.java
+--- a/src/main/java/org/projektarbete/Appointment.java	(revision c992bb0909e61c73c8576f9ddbe01772feac3345)
++++ b/src/main/java/org/projektarbete/Appointment.java	(date 1705678277385)
+@@ -1,26 +1,27 @@
+ package org.projektarbete;
+-import java.time.LocalDate;
+-import java.time.format.DateTimeFormatter;
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-
++/**
++ * Appointment-klassen representerar ett möte och innehåller information om mötet,
++ * inklusive namn, ID-nummer, e-postadress, datum, tid och beskrivning.
++ */
+ public class Appointment {
+-    private final int id;
+-    private final String name;
+-    private final String idNumber;
+-    private final String email;
+-    private final String date;
+-    private final String time;
+-    private final String description;
++    private String name; // Namnet på personen som mötet gäller
++    private String idNumber; // Personnummer
++    private String email; // E-postadress för personen
++    private String date; // Datumet för mötet (format: ÅÅÅÅ-MM-DD)
++    private String time; // Tiden för mötet (format: HH:MM)
++    private String description; // Beskrivning av mötet
+ 
+-    public Appointment(int id, String name, String idNumber, String email, String date, String time, String description) {
+-        List<String> errorMessage = new ArrayList<>();
+-        validateAppointmentInput(name, idNumber, email, date, time, description,errorMessage);
+-        if (!errorMessage.isEmpty()){
+-            throw new IllegalArgumentException(String.join("\n", errorMessage));
+-        }
+-        this.id = id;
++    /**
++     * Skapar en ny instans av Appointment med angiven information.
++     *
++     * @param name        Namnet för mötet.
++     * @param idNumber    ID-numret för personen.
++     * @param email       E-postadressen för personen.
++     * @param date        Datumet för mötet (format: ÅÅÅÅ-MM-DD).
++     * @param time        Tiden för mötet (format: HH:MM).
++     * @param description Beskrivningen av mötet.
++     */
++    public Appointment(String name, String idNumber, String email, String date, String time, String description) {
+         this.name = name;
+         this.idNumber = idNumber;
+         this.email = email;
+@@ -29,136 +30,57 @@
+         this.description = description;
+     }
+ 
+-
+-    /*
+-    *Centralises all logic for validations
+-    * Allows for checking of mutiple aspects of the appoinment input in one place
+-     */
+-    private static void validateAppointmentInput(String name, String idNumber, String email, String date, String time, String description,List<String> errorMessage) {
+-        validateName(name,errorMessage);
+-        validateIdNumber(idNumber,errorMessage);
+-        validateEmail(email,errorMessage);
+-        validateDate(date,errorMessage);
+-        validateTime(time,errorMessage);
+-        validateDescription(description,errorMessage);
+-    }
+-    /*
+-    *Testing validations in appointment
+-    * calling validateallfields from appointment
+-    * hard coded some specific parameter such my name, id, example email
+-    * if everything is correct format and nothing is empty we get a message confirming that it was succful
+-    * otherwise we get it failed.
++    /**
++     * Returnerar namnet för mötet.
++     *
++     * @return Namnet för mötet.
+      */
+-    public  static void main (String[]args){
+-        try {
+-            Appointment.validateAllFields("Zion Awino", "1234567890", "awno.zion@gmail.com", "2024-01-17", "12:30", "Something");
+-            System.out.println("Validation successful");
+-        } catch (IllegalArgumentException e) {
+-            System.out.println("Validation failed: " + e.getMessage());
+-        }
+-    }
+-/*
+-*Initilize an empty arraylist to store error message
+-* call the methods used for validation
+-* it accumulates the error messages if an input fails/is in the wrong format
+-* is the array is not empty joins all error messages
+- */
+-    static void validateAllFields(String name,String idNumber,String email, String date,String time, String description){
+-        List<String> errorMessage = new ArrayList<>();
+-
+-        validateName(name, errorMessage);
+-        validateEmail(email,errorMessage);
+-        validateIdNumber(idNumber,errorMessage);
+-        validateDate(date, errorMessage);
+-        validateTime(time,errorMessage);
+-        validateDescription(description,errorMessage);
+-
+-        if (!errorMessage.isEmpty()){
+-            throw new IllegalArgumentException(String.join("\n",errorMessage));
+-        }
+-    }
+-    // Validation methods with improved error messages and corrected return types
+-    static void validateName(String name, List<String> errorMessage) {
+-        if (name == null || name.trim().isEmpty()) {
+-            errorMessage.add("Namn kan inte vara eller tomt");
+-        }
+-    }
+-    //we might not need this
+-    static void validateIdNumber(String idNumber,List<String> errorMessage) {
+-        if (idNumber == null || !idNumber.matches("\\d{10}")) {
+-            errorMessage.add("Ogiltigt personnummer. Ange 10 siffror");
+-        }
+-    }
+-
+-//*Added that an email must end in a .com
+-    //Checks the format of the email.
+-    // it has to have a 'name', '@' sign and end with '.com'
+-
+-
+-    static void validateEmail(String email,List <String> errorMessage) {
+-        if (email == null || !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+-            errorMessage.add("Ogiltig e-postadress.format måste blir namn@namn.com/.org/.net");
+-        }
+-    }
+-    // Checks so that the date is in the future and not in the past
+-    //At the same time checks if it is the right format.
+-    static void validateDate(String date, List <String> errorMessage) {
+-        if (date == null || !date.matches("\\d{4}-\\d{2}-\\d{2}")) {
+-            errorMessage.add("Ogiltigt datumformat. Använd ÅÅÅÅ-MM-DD");
+-        } else {
+-            LocalDate currentDate = LocalDate.now();
+-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+-            LocalDate providedDate = LocalDate.parse(date, formatter);
+-
+-            if (providedDate.isBefore(currentDate)) {
+-                errorMessage.add("Datumet måste blir i framtiden");
+-            }
+-        }
+-    }
+-    //Checks if the right format for time has been typed
+-    static void validateTime(String time,List <String> errorMessage) {
+-        if (time == null || !time.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]")) {
+-            errorMessage.add("Ogiltigt tidsformat. Använd HH:MM");
+-        }
+-    }
+-    //Checks if something has been typed or not.
+-    static void validateDescription(String description,List <String> errorMessage) {
+-        if (description == null || description.trim().isEmpty()) {
+-            errorMessage.add("Beskrivning kan inte vara tom");
+-        }
+-    }
+-
+-
+-    // Getters
+-    public int getId() {
+-        return id;
+-    }
+-
+     public String getName() {
+         return name;
+     }
+ 
++    /**
++     * Returnerar ID-numret för personen.
++     *
++     * @return ID-numret för personen.
++     */
+     public String getIdNumber() {
+         return idNumber;
+     }
+ 
++    /**
++     * Returnerar e-postadressen för personen.
++     *
++     * @return E-postadressen för personen.
++     */
+     public String getEmail() {
+         return email;
+     }
+ 
++    /**
++     * Returnerar datumet för mötet.
++     *
++     * @return Datumet för mötet (format: ÅÅÅÅ-MM-DD).
++     */
+     public String getDate() {
+         return date;
+     }
+ 
++    /**
++     * Returnerar tiden för mötet.
++     *
++     * @return Tiden för mötet (format: HH:MM).
++     */
+     public String getTime() {
+         return time;
+     }
+ 
++    /**
++     * Returnerar beskrivningen av mötet.
++     *
++     * @return Beskrivningen av mötet.
++     */
+     public String getDescription() {
+         return description;
+     }
+-
+-    public String toString(){
+-        return "Namn:\t%s%nPersonnummer:\t%s%nE-post:\t%s%nDatum:\t%s%nTid:\t%s%nBeskrivning:\t%s%n".formatted(name, idNumber,email,date,time,description);
+-    }
+ }
+Index: src/main/java/org/projektarbete/InputReader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.projektarbete;\r\n\r\nimport java.util.Scanner;\r\n\r\npublic class InputReader {\r\n\r\n    Scanner input = new Scanner(System.in);\r\n\r\n    /**\r\n     * Läser in en sträng från tangentbordet\r\n     *\r\n     * @param prompt är det som användaren ska svara på\r\n     * @return vad användaren skrev in\r\n     */\r\n    public String readString(String prompt) {\r\n        System.out.print(prompt);\r\n        return input.nextLine();\r\n\r\n    }\r\n\r\n    public int readInt(String prompt) {\r\n        System.out.print(prompt);\r\n        int number = input.nextInt();\r\n        input.nextLine();\r\n        return number;\r\n\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/InputReader.java b/src/main/java/org/projektarbete/InputReader.java
+--- a/src/main/java/org/projektarbete/InputReader.java	(revision c992bb0909e61c73c8576f9ddbe01772feac3345)
++++ b/src/main/java/org/projektarbete/InputReader.java	(date 1705678277405)
+@@ -2,28 +2,63 @@
+ 
+ import java.util.Scanner;
+ 
+-public class InputReader {
++/**
++ * En klass som hanterar inläsning av användarinmatning från terminalen.
++ */
++public class InputReader implements AutoCloseable {
+ 
+-    Scanner input = new Scanner(System.in);
++    private final Scanner input = new Scanner(System.in);
+ 
+     /**
+-     * Läser in en sträng från tangentbordet
++     * Läser in en sträng från terminalen.
+      *
+-     * @param prompt är det som användaren ska svara på
+-     * @return vad användaren skrev in
++     * @param prompt en prompt som visas för användaren
++     * @return den inmatade strängen från användaren
+      */
+     public String readString(String prompt) {
+-        System.out.print(prompt);
++        System.out.print(prompt + " ");
+         return input.nextLine();
++    }
+ 
++    /**
++     * Läser in en hel rad från terminalen.
++     *
++     * @return den inmatade raden från användaren
++     */
++    public String nextLine() {
++        return input.nextLine();
+     }
+ 
+-    public int readInt(String prompt) {
+-        System.out.print(prompt);
+-        int number = input.nextInt();
+-        input.nextLine();
+-        return number;
++    /**
++     * Läser in ett enskilt ord eller token från terminalen.
++     *
++     * @return det inmatade ordet eller tokenet från användaren
++     */
++    public String next() {
++        return input.next();
++    }
+ 
++    /**
++     * Läser in ett heltal från terminalen.
++     *
++     * @return det inmatade heltalet från användaren
++     */
++    public int nextInt() {
++        return input.nextInt();
+     }
+-}
++
++    /**
++     * Stänger Scanner-objektet för att slutföra inmatningsoperationer.
++     */
++    public void closeScanner() {
++        input.close();
++    }
+ 
++    /**
++     * Stänger InputReader och därmed även Scanner-objektet.
++     */
++    @Override
++    public void close() {
++        closeScanner();
++    }
++}
+Index: src/main/java/org/projektarbete/AppointmentRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/AppointmentRepository.java b/src/main/java/org/projektarbete/AppointmentRepository.java
+new file mode 100644
+--- /dev/null	(date 1705678277393)
++++ b/src/main/java/org/projektarbete/AppointmentRepository.java	(date 1705678277393)
+@@ -0,0 +1,425 @@
++package org.projektarbete;
++
++import java.sql.*;
++import java.util.Map;
++
++/**
++ * Hanterar mötesinformation och interaktion med en databas.
++ */
++public class AppointmentRepository {
++
++    // Fält för databaskolumnernas namn
++    private static final String FIELD_NAME = "name";
++    private static final String FIELD_ID_NUMBER = "idNumber";
++    private static final String FIELD_DATE = "date";
++
++    // Konstanter för JDBC URL och databasnamn
++    private static final String JDBC_URL = DatabaseManager.getJDBCUrl();
++    private static final String DATABASE_NAME = DatabaseManager.getDatabaseName();
++
++    // InputReader för användarinput
++    private static final InputReader inputReader = new InputReader();
++
++    // Kartläggning av engelska fältnamn till svenska visningsnamn
++    private static final Map<String, String> SWEDISH_FIELD_NAMES = Map.of(
++            FIELD_NAME, "Namn",
++            FIELD_ID_NUMBER, "Personnummer",
++            FIELD_DATE, "Datum"
++    );
++
++    // Totalt antal möten
++    private int totalMeetings;
++
++    /**
++     * Skapar en AppointmentRepository med en initial totalt möten-räkning på 0.
++     */
++    public AppointmentRepository() {
++        this.totalMeetings = 0;
++    }
++
++    /**
++     * Hämtar det aktuella antalet mötesposter i systemet.
++     *
++     * @return Antalet mötesposter i systemet.
++     */
++    public int getRecordCount() {
++        return totalMeetings;
++    }
++
++    /**
++     * Initialiserar databasen genom att skapa nödvändiga tabeller och laddar det totala antalet möten.
++     */
++    public void initializeDatabase() {
++        DatabaseManager.createDatabaseAndTableIfNotExists();
++        loadTotalMeetings();
++    }
++
++    /**
++     * Laddar det totala antalet möten från databasen.
++     */
++
++    /**
++     * Hanterar ett SQLException genom att skriva ut felmeddelandet och stacktrace till standardfelströmmen.
++     *
++     * @param message Beskrivande meddelande om det uppstådda felet.
++     * @param e SQLException som innehåller information om det uppstådda felet.
++     */
++    private void handleSQLException(String message, SQLException e) {
++        System.err.println(message + ": " + e.getMessage());
++        e.printStackTrace();
++    }
++    private void loadTotalMeetings() {
++        try (Connection connection = DatabaseManager.getConnection();
++             Statement statement = connection.createStatement()) {
++
++            String query = "SELECT COUNT(*) FROM Appointments";
++            ResultSet resultSet = statement.executeQuery(query);
++
++            if (resultSet.next()) {
++                totalMeetings = resultSet.getInt(1);
++            }
++
++        } catch (SQLException e) {
++            handleSQLException("Fel vid inläsning av totalMeetings", e);
++        }
++    }
++
++    /**
++     * Lägger till ett möte i databasen.
++     *
++     * @param appointment Möte att lägga till.
++     * @throws IllegalArgumentException Om ett fel inträffar under insättning i databasen.
++     */
++    public void addAppointment(Appointment appointment) {
++        try (PreparedStatement preparedStatement = DatabaseManager.getConnection().prepareStatement(
++                "INSERT INTO Appointments (Name, IdNumber, Email, Date, Time, Description) VALUES (?, ?, ?, ?, ?, ?)")) {
++
++            preparedStatement.setString(1, appointment.getName());
++            preparedStatement.setString(2, appointment.getIdNumber());
++            preparedStatement.setString(3, appointment.getEmail());
++            preparedStatement.setString(4, appointment.getDate());
++            preparedStatement.setString(5, appointment.getTime());
++            preparedStatement.setString(6, appointment.getDescription());
++
++            preparedStatement.executeUpdate();
++
++            // Ökar totalMeetings-räkningen efter lyckad addition
++            totalMeetings++;
++
++        } catch (SQLException e) {
++            System.err.println("Fel vid läggning av möte i databasen: " + e.getMessage());
++            e.printStackTrace();
++            throw new IllegalArgumentException("Fel vid läggning av möte i databasen: " + e.getMessage());
++        }
++    }
++
++    /**
++     * Söker efter möten baserat på ett fält och dess värde.
++     *
++     * @param field Fältet att söka efter.
++     * @param value Värdet att matcha.
++     */
++    public void searchByField(String field, String value) {
++        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
++             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Appointments WHERE " + field + " = ?")) {
++
++            statement.setString(1, value);
++
++            try (ResultSet resultSet = statement.executeQuery()) {
++                while (resultSet.next()) {
++                    printAppointmentDetails(resultSet);
++                }
++            }
++        } catch (SQLException e) {
++            handleSQLException("Fel vid sökning efter poster", e);
++        }
++    }
++
++    /**
++     * Skriver ut detaljer för ett möte från ResultSet till konsolen.
++     *
++     * @param resultSet ResultSet som innehåller mötesdetaljerna.
++     * @throws SQLException Om det uppstår ett SQL-relaterat fel vid åtkomst till ResultSet.
++     */
++    private void printAppointmentDetails(ResultSet resultSet) throws SQLException {
++        System.out.println("Namn: " + resultSet.getString("Name"));
++        System.out.println("Personnummer: " + resultSet.getString("IdNumber"));
++        System.out.println("E-post: " + resultSet.getString("Email"));
++        System.out.println("Datum: " + resultSet.getString("Date"));
++        System.out.println("Tid: " + resultSet.getString("Time"));
++        System.out.println("Beskrivning: " + resultSet.getString("Description"));
++        System.out.println("------------------------------------------------------------");
++    }
++
++    /**
++     * Kontrollerar om det finns en post i databasen som matchar det angivna fältet och värdet.
++     *
++     * @param connection En aktiv JDBC Connection.
++     * @param field      Fältet att söka efter (t.ex., "name", "idNumber", "date").
++     * @param value      Värdet som ska matchas i det angivna fältet.
++     * @return true om en matchande post finns, annars false.
++     * @throws SQLException om det uppstår ett SQL-relaterat fel.
++     */
++    private boolean recordExistsByField(Connection connection, String field, String value) throws SQLException {
++        String query = "SELECT 1 FROM Appointments WHERE " + field + " = ?";
++
++        try (PreparedStatement checkStatement = connection.prepareStatement(query)) {
++            checkStatement.setString(1, value);
++            ResultSet resultSet = checkStatement.executeQuery();
++            return resultSet.next();
++        }
++    }
++
++
++    /**
++     * Uppdaterar en mötespost i databasen baserat på det angivna fältet och det gamla värdet.
++     *
++     * @param field         Fältet att söka efter (t.ex., "name", "idNumber", "date").
++     * @param oldValue      Det gamla värdet i det angivna fältet.
++     * @param newAppointment En Appointment-objekt med uppdaterade värden.
++     * @throws SQLException Om det uppstår ett SQL-relaterat fel under uppdateringen.
++     */
++    void updateRecord(String field, String oldValue, Appointment newAppointment) throws SQLException {
++        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME)) {
++
++            // Kontrollera om posten finns innan uppdatering
++            if (!recordExistsByField(connection, field, oldValue)) {
++                System.out.println("Ingen post hittades med det angivna värdet för fältet.");
++                return;
++            }
++
++            // Posten finns, fortsätt med uppdateringen
++
++            System.out.println("Uppdaterar informationen...");
++            Thread.sleep(500);
++            System.out.println("Nytt namn: " + newAppointment.getName());
++            System.out.println("Nytt personnummer: " + newAppointment.getIdNumber());
++            System.out.println("Ny e-post: " + newAppointment.getEmail());
++            System.out.println("Nytt datum: " + newAppointment.getDate());
++            System.out.println("Ny tid: " + newAppointment.getTime());
++            System.out.println("Ny beskrivning: " + newAppointment.getDescription());
++            System.out.println("------------------------------------------------------------");
++
++            try (PreparedStatement updateStatement = connection.prepareStatement(
++                    "UPDATE Appointments SET name = ?, idNumber = ?, email = ?, date = ?, time = ?, description = ? WHERE " + field + " = ?",
++                    Statement.NO_GENERATED_KEYS)) {
++
++                // Sätt parametrar för uppdateringsuttrycket
++                updateStatement.setString(1, newAppointment.getName());
++                updateStatement.setString(2, newAppointment.getIdNumber());
++                updateStatement.setString(3, newAppointment.getEmail());
++                updateStatement.setString(4, newAppointment.getDate());
++                updateStatement.setString(5, newAppointment.getTime());
++                updateStatement.setString(6, newAppointment.getDescription());
++                updateStatement.setString(7, oldValue);
++
++                int rowsAffected = updateStatement.executeUpdate();
++
++                if (rowsAffected > 0) {
++                    System.out.println("Posten har uppdaterats framgångsrikt!");
++                } else {
++                    System.out.println("Ingen post hittades med det angivna värdet för fältet.");
++                }
++            } catch (SQLException e) {
++                handleSQLException("Fel vid uppdatering av möte", e);
++            }
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++    }
++
++    /**
++     * Hanterar resultatet av en raderingsförfrågan och visar lämpliga meddelanden.
++     *
++     * @param rowsAffected Antal rader påverkade av raderingsförfrågan.
++     * @param value        Värdet som raderades.
++     * @param fieldName    Namnet på fältet där raderingen skedde.
++     */
++    private void handleDeleteResult(int rowsAffected, String value, String fieldName) {
++        if (rowsAffected > 0) {
++            totalMeetings--;
++
++            if (totalMeetings == 0) {
++                // Återställ identitetsfröet för ID-kolumnen när totalMeetings når 0
++                resetIdentitySeed();
++            }
++
++            System.out.println("\nPost med " + getSwedishFieldName(fieldName) + " '" + value + "' har raderats framgångsrikt!");
++            System.out.println("Totalt antal möten i systemet: " + totalMeetings + "\n");
++        } else {
++            System.out.println("Ingen post hittades med " + getSwedishFieldName(fieldName) + " '" + value + "'.");
++        }
++    }
++
++    /**
++     * Återställer identitetsfröet för ID-kolumnen i databasen.
++     */
++    private void resetIdentitySeed() {
++        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
++             Statement statement = connection.createStatement()) {
++
++            // Återställ identitetsfröet för ID-kolumnen
++            String resetIdentityQuery = "DBCC CHECKIDENT ('Appointments', RESEED, 0)";
++            statement.execute(resetIdentityQuery);
++
++            System.out.println("Identity seed för ID-kolumnen har återställts till 0.");
++        } catch (SQLException e) {
++            handleSQLException("Fel vid återställning av identity seed", e);
++            e.printStackTrace();
++        }
++    }
++
++    /**
++     * Raderar en post från databasen baserat på ett angivet fältnamn och värde.
++     * Uppdaterar även totala mötesräkningen och återställer identitetsfröet vid behov.
++     *
++     * @param fieldName Fältnamn som ska matchas för att hitta posten.
++     * @param value     Värdet som används för att matcha och identifiera posten.
++     */
++    private void deleteRecordByField(String fieldName, String value) {
++        try (Connection connection = DatabaseManager.getConnection()) {
++            String deleteQuery = "DELETE FROM Appointments WHERE " + fieldName + " = ?";
++            try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
++                statement.setString(1, value);
++                int rowsAffected = statement.executeUpdate();
++
++                handleDeleteResult(rowsAffected, value, fieldName);
++            }
++        } catch (SQLException e) {
++            handleSQLException("Fel vid radering av möte med " + getSwedishFieldName(fieldName), e);
++        }
++    }
++
++
++    /**
++     * Hämtar det svenska fältnamnet för ett givet engelskt fältnamn.
++     *
++     * @param englishFieldName Det engelska fältnamnet.
++     * @return Det svenska fältnamnet om det finns, annars det engelska fältnamnet.
++     */
++    String getSwedishFieldName(String englishFieldName) {
++        return SWEDISH_FIELD_NAMES.getOrDefault(englishFieldName, englishFieldName);
++    }
++
++    /**
++     * Raderar möten baserat på namn.
++     *
++     * @param nameToDelete Namnet på mötet som ska raderas.
++     */
++    public void deleteAppointmentByName(String nameToDelete) {
++        deleteRecordByField(FIELD_NAME, nameToDelete);
++    }
++
++    /**
++     * Raderar möten baserat på personnummer.
++     *
++     * @param idNumberToDelete Personnummer för mötet som ska raderas.
++     */
++    public void deleteAppointmentByIdNumber(String idNumberToDelete) {
++        deleteRecordByField(FIELD_ID_NUMBER, idNumberToDelete);
++    }
++
++    /**
++     * Raderar möten baserat på datum.
++     *
++     * @param dateToDelete Datumet för mötet som ska raderas.
++     */
++    public void deleteAppointmentByDate(String dateToDelete) {
++        deleteRecordByField(FIELD_DATE, dateToDelete);
++    }
++
++    /**
++     * Raderar alla möten från databasen.
++     */
++    public void deleteAllRecords() {
++        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
++             Statement statement = connection.createStatement()) {
++
++            // Om totalMeetings är 0, återgå till huvudmenyn
++            if (totalMeetings == 0) {
++                System.out.println("Inga poster att radera.");
++                System.out.println("Återgår till huvudmenyn...");
++                return;
++            }
++
++            // Fråga om bekräftelse för att radera alla möten
++            System.out.println("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
++            String confirmation = inputReader.nextLine(); // Använd inputReader istället för scanner
++
++            if (confirmation.equalsIgnoreCase("ja")) {
++                String deleteQuery = "DELETE FROM Appointments";
++                int rowsAffected = statement.executeUpdate(deleteQuery);
++
++                if (rowsAffected > 0) {
++                    totalMeetings = 0;
++
++                    // Återställ identitetsfröet för ID-kolumnen
++                    String resetIdentityQuery = "DBCC CHECKIDENT ('Appointments', RESEED, 0)";
++                    statement.execute(resetIdentityQuery);
++
++                    System.out.println("Alla poster har raderats framgångsrikt!");
++                    System.out.println("Totalt antal möten i systemet: " + totalMeetings + "\n");
++                } else {
++                    System.out.println("Inga poster hittades att radera.");
++                }
++            } else {
++                System.out.println("Radering av alla möten avbruten.");
++            }
++
++        } catch (SQLException e) {
++            handleSQLException("Fel vid radering av alla poster", e);
++            e.printStackTrace();
++        }
++    }
++
++    /**
++     * Visar alla mötesposter i databasen.
++     *
++     * @throws SQLException Om det uppstår ett SQL-relaterat fel.
++     */
++    public void showRecords() throws SQLException {
++        String query = "SELECT * FROM Appointments";
++
++        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
++             Statement statement = connection.createStatement();
++             ResultSet resultSet = statement.executeQuery(query)) {
++
++            int totalMeetings = 0;
++
++            while (resultSet.next()) {
++                int id = resultSet.getInt("id");
++                String name = resultSet.getString(FIELD_NAME);
++                String idNumber = resultSet.getString(FIELD_ID_NUMBER);
++                String email = resultSet.getString("email");
++                String date = resultSet.getString(FIELD_DATE);
++                String time = resultSet.getString("time");
++                String description = resultSet.getString("description");
++
++                System.out.println("ID: " + id);
++                System.out.println(getSwedishFieldName(FIELD_NAME) + ": " + name);
++                System.out.println(getSwedishFieldName(FIELD_ID_NUMBER) + ": " + idNumber);
++                System.out.println("E-post: " + email);
++                System.out.println(getSwedishFieldName(FIELD_DATE) + ": " + date);
++                System.out.println("Tid: " + time);
++                System.out.println("Beskrivning: " + description);
++                System.out.println("------------------------------------------------------------");
++
++                totalMeetings++;
++            }
++
++            System.out.println("\nTotalt antal möten i systemet: " + totalMeetings + "\n");
++
++        } catch (SQLException e) {
++            System.err.println("Fel vid visning av poster: " + e.getMessage());
++            throw e;
++        }
++    }
++
++    /**
++     * Stänger inputläsaren.
++     */
++    public void closeInputReader() {
++        inputReader.closeScanner(); // Se till att skannern stängs när den behövs
++    }
++}
++
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"b1293931-78f6-405f-9cb5-3f3848f0f5e1\" name=\"Changes\" comment=\"Updated the validation methods. added comments on changes.\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"ProjectErrors\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2aifXs9yIRRaT0JvTY28XycGe4T\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Application.Appointment.executor\": \"Run\",\r\n    \"Application.AppointmentAgenda.executor\": \"Run\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"git-widget-placeholder\": \"master\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"onboarding.tips.debug.path\": \"C:/Users/zion.awino/java testing/Javagroupwork/Java grgouup work/src/main/java/org/example/Main.java\",\r\n    \"run.code.analysis.last.selected.profile\": \"pProject Default\",\r\n    \"settings.editor.selected.configurable\": \"reference.settings.project.maven.repository.indices\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  },\r\n  \"keyToStringList\": {\r\n    \"ChangesTree.GroupingKeys\": [\r\n      \"module\"\r\n    ]\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Appointment\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.projektarbete.Appointment\" />\r\n      <module name=\"Javagroupwork\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.projektarbete.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\r\n      <option name=\"filePath\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.Appointment\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-21.0.1-openjdk-21.0.1-f644763e9732-f98dd351\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"b1293931-78f6-405f-9cb5-3f3848f0f5e1\" name=\"Changes\" comment=\"\" />\r\n      <created>1704806365135</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1704806365135</updated>\r\n      <workItem from=\"1704806366219\" duration=\"3000\" />\r\n      <workItem from=\"1705254611535\" duration=\"13245000\" />\r\n      <workItem from=\"1705506929137\" duration=\"4331000\" />\r\n    </task>\r\n    <task id=\"LOCAL−00001\" summary=\"Basic functions have been updated\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1705323121724</created>\r\n      <option name=\"number\" value=\"LOCAL−00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL−00001\" />\r\n      <updated>1705323121724</updated>\r\n    </task>\r\n    <task id=\"LOCAL−00002\" summary=\"Updated the validateDate.now cannoct book meeting in the past.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1705324573111</created>\r\n      <option name=\"number\" value=\"LOCAL−00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL−00002\" />\r\n      <updated>1705324573111</updated>\r\n    </task>\r\n    <task id=\"LOCAL−00003\" summary=\"Updated the validation methods. added comments on changes.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1705509290019</created>\r\n      <option name=\"number\" value=\"LOCAL−00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL−00003\" />\r\n      <updated>1705509290020</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"Basic functions have been updated\" />\r\n    <MESSAGE value=\"Updated the validateDate.now cannoct book meeting in the past.\" />\r\n    <MESSAGE value=\"Updated the validation methods. added comments on changes.\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Updated the validation methods. added comments on changes.\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision c992bb0909e61c73c8576f9ddbe01772feac3345)
++++ b/.idea/workspace.xml	(date 1705783722253)
+@@ -4,26 +4,37 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Updated the validation methods. added comments on changes.">
++    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="1.1 Design och visning av huvudmeny">
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentRepository.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/DatabaseManager.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/UserInterface.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/Appointment.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/InputReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/InputReader.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
+-  </component>
+-  <component name="FileTemplateManagerImpl">
+-    <option name="RECENT_TEMPLATES">
+-      <list>
+-        <option value="Class" />
+-      </list>
+-    </option>
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="ProblemsViewState">
+-    <option name="selectedTabId" value="ProjectErrors" />
++  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
++  "lastFilter": {
++    "state": "OPEN",
++    "assignee": "IgorGomes01"
++  }
++}]]></component>
++  <component name="GithubPullRequestsUISettings">
++    <option name="selectedUrlAndAccountId">
++      <UrlAndAccount>
++        <option name="accountId" value="e83f9eef-55c4-4ae3-a6c5-3fafc92c9bf1" />
++        <option name="url" value="https://github.com/unikhex/Java-group-work" />
++      </UrlAndAccount>
++    </option>
+   </component>
+   <component name="ProjectColorInfo">{
+   &quot;associatedIndex&quot;: 2
+@@ -36,60 +47,20 @@
+   </component>
+   <component name="PropertiesComponent"><![CDATA[{
+   "keyToString": {
+-    "Application.Appointment.executor": "Run",
+     "Application.AppointmentAgenda.executor": "Run",
++    "Maven.Javagroupwork [clean].executor": "Run",
++    "Maven.Javagroupwork [site].executor": "Run",
++    "Maven.Javagroupwork [validate].executor": "Run",
+     "RunOnceActivity.OpenProjectViewOnStart": "true",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+     "git-widget-placeholder": "master",
+     "kotlin-language-version-configured": "true",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+     "nodejs_package_manager_path": "npm",
+     "onboarding.tips.debug.path": "C:/Users/zion.awino/java testing/Javagroupwork/Java grgouup work/src/main/java/org/example/Main.java",
+-    "run.code.analysis.last.selected.profile": "pProject Default",
+     "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
+     "vue.rearranger.settings.migration": "true"
+-  },
+-  "keyToStringList": {
+-    "ChangesTree.GroupingKeys": [
+-      "module"
+-    ]
+   }
+ }]]></component>
+-  <component name="RunManager">
+-    <configuration name="Appointment" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+-      <option name="MAIN_CLASS_NAME" value="org.projektarbete.Appointment" />
+-      <module name="Javagroupwork" />
+-      <extension name="coverage">
+-        <pattern>
+-          <option name="PATTERN" value="org.projektarbete.*" />
+-          <option name="ENABLED" value="true" />
+-        </pattern>
+-      </extension>
+-      <method v="2">
+-        <option name="Make" enabled="true" />
+-      </method>
+-    </configuration>
+-    <configuration default="true" type="JetRunConfigurationType">
+-      <method v="2">
+-        <option name="Make" enabled="true" />
+-      </method>
+-    </configuration>
+-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+-      <option name="filePath" />
+-      <method v="2">
+-        <option name="Make" enabled="true" />
+-      </method>
+-    </configuration>
+-    <recent_temporary>
+-      <list>
+-        <item itemvalue="Application.Appointment" />
+-      </list>
+-    </recent_temporary>
+-  </component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+@@ -106,31 +77,7 @@
+       <option name="presentableId" value="Default" />
+       <updated>1704806365135</updated>
+       <workItem from="1704806366219" duration="3000" />
+-      <workItem from="1705254611535" duration="13245000" />
+-      <workItem from="1705506929137" duration="4331000" />
+     </task>
+-    <task id="LOCAL−00001" summary="Basic functions have been updated">
+-      <option name="closed" value="true" />
+-      <created>1705323121724</created>
+-      <option name="number" value="LOCAL−00001" />
+-      <option name="presentableId" value="LOCAL−00001" />
+-      <updated>1705323121724</updated>
+-    </task>
+-    <task id="LOCAL−00002" summary="Updated the validateDate.now cannoct book meeting in the past.">
+-      <option name="closed" value="true" />
+-      <created>1705324573111</created>
+-      <option name="number" value="LOCAL−00002" />
+-      <option name="presentableId" value="LOCAL−00002" />
+-      <updated>1705324573111</updated>
+-    </task>
+-    <task id="LOCAL−00003" summary="Updated the validation methods. added comments on changes.">
+-      <option name="closed" value="true" />
+-      <created>1705509290019</created>
+-      <option name="number" value="LOCAL−00003" />
+-      <option name="presentableId" value="LOCAL−00003" />
+-      <updated>1705509290020</updated>
+-    </task>
+-    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -147,10 +94,4 @@
+       </map>
+     </option>
+   </component>
+-  <component name="VcsManagerConfiguration">
+-    <MESSAGE value="Basic functions have been updated" />
+-    <MESSAGE value="Updated the validateDate.now cannoct book meeting in the past." />
+-    <MESSAGE value="Updated the validation methods. added comments on changes." />
+-    <option name="LAST_COMMIT_MESSAGE" value="Updated the validation methods. added comments on changes." />
+-  </component>
+ </project>
+\ No newline at end of file
+Index: src/main/java/org/projektarbete/DatabaseManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/DatabaseManager.java b/src/main/java/org/projektarbete/DatabaseManager.java
+new file mode 100644
+--- /dev/null	(date 1705678265298)
++++ b/src/main/java/org/projektarbete/DatabaseManager.java	(date 1705678265298)
+@@ -0,0 +1,129 @@
++package org.projektarbete;
++
++import java.sql.*;
++import java.sql.Connection;
++import java.sql.DriverManager;
++import java.sql.SQLException;
++
++/**
++ * Hanterar anslutningen till databasen och skapar databas och tabell om de inte redan existerar.
++ */
++public class DatabaseManager {
++
++    private static final String SERVER_NAME = "localhost";
++    private static final String DATABASE_NAME = "AppointmentScheduler";
++    private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
++    private static final String JDBC_URL = "jdbc:sqlserver://" + SERVER_NAME + ":1433;integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
++
++    private static Connection connection; // Deklarera anslutningen på klassnivå
++
++    /**
++     * Lägger till en stängningskrok för att rensa upp vid avslut, t.ex. stänga databasanslutningen.
++     */
++    static {
++        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
++            // Utför städuppgifter vid avslut, såsom att stänga databasanslutningen
++            closeConnection();
++        }));
++    }
++
++    /**
++     * Skapar databas och tabell om de inte redan existerar.
++     */
++    static void createDatabaseAndTableIfNotExists() {
++        try {
++            // Register the SQL Server JDBC driver
++            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
++
++            try (Connection localConnection = DriverManager.getConnection(JDBC_URL);
++                 Statement statement = localConnection.createStatement()) {
++
++                String checkDatabaseQuery = "SELECT 1 FROM sys.databases WHERE name = '" + DATABASE_NAME + "'";
++                ResultSet resultSet = statement.executeQuery(checkDatabaseQuery);
++
++                if (!resultSet.next()) {
++                    String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
++                    statement.executeUpdate(createDatabaseQuery);
++                    System.out.println("Din databas har skapats framgångsrikt!");
++
++                    try (Connection dbConnection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
++                         Statement dbStatement = dbConnection.createStatement()) {
++
++                        String createTableQuery = "CREATE TABLE Appointments ( " +
++                                "Id INT PRIMARY KEY IDENTITY(1,1), " + // Auto-ökande ID
++                                "Name NVARCHAR(255), " +
++                                "IdNumber NVARCHAR(20), " +
++                                "Email NVARCHAR(255), " +
++                                "Date NVARCHAR(20), " +
++                                "Time NVARCHAR(20), " +
++                                "Description NVARCHAR(MAX) " +
++                                ")";
++
++                        dbStatement.executeUpdate(createTableQuery);
++                        System.out.println("Din tabell har skapats framgångsrikt!");
++                    }
++                } else {
++                    System.out.println("Din databas har redan skapats tidigare.");
++                }
++
++                // Tilldela localConnection till anslutningen på klassnivå
++                connection = localConnection;
++
++            } catch (SQLException e) {
++                System.err.println("Fel vid skapande eller granskning av databas/tabell: " + e.getMessage());
++                e.printStackTrace();
++            }
++        } catch (ClassNotFoundException e) {
++            System.err.println("Fel vid laddning av JDBC-driver: " + e.getMessage());
++            e.printStackTrace();
++        }
++    }
++    /**
++     * Etablerar en anslutning till databasen.
++     *
++     * @return Connection-objekt om det är framgångsrikt, annars null.
++     */
++    public static Connection getConnection() {
++        try {
++            return DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
++        } catch (SQLException e) {
++            System.err.println("Fel vid etablering av databasanslutning: " + e.getMessage());
++            e.printStackTrace();
++            return null;
++        }
++    }
++
++    /**
++     * Returnerar JDBC URL för databasanslutningen.
++     *
++     * @return JDBC URL
++     */
++    public static String getJDBCUrl() {
++        return JDBC_URL + ";databaseName=" + DATABASE_NAME;
++    }
++
++    /**
++     * Returnerar namnet på databasen.
++     *
++     * @return Databasens namn
++     */
++    public static String getDatabaseName() {
++        return DATABASE_NAME;
++    }
++
++    /**
++     * Stänger databasanslutningen.
++     */
++    public static void closeConnection() {
++        try {
++            if (connection != null && !connection.isClosed()) {
++                connection.close();
++                System.out.println("Databasanslutning stängd.");
++            }
++        } catch (SQLException e) {
++            System.err.println("Fel vid stängning av databasanslutning: " + e.getMessage());
++            e.printStackTrace();
++        }
++    }
++}
++
+Index: src/main/java/org/projektarbete/UserInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/UserInterface.java b/src/main/java/org/projektarbete/UserInterface.java
+new file mode 100644
+--- /dev/null	(date 1705678277374)
++++ b/src/main/java/org/projektarbete/UserInterface.java	(date 1705678277374)
+@@ -0,0 +1,148 @@
++package org.projektarbete;
++
++import java.util.InputMismatchException;
++
++/**
++ * En klass som representerar användargränssnittet för möteshanteringsapplikationen.
++ */
++public class UserInterface {
++
++    /**
++     * Alternativ för att lägga till ett nytt möte.
++     */
++    public static final int ADD_APPOINTMENT_OPTION = 1;
++
++    /**
++     * Alternativ för att söka efter ett möte.
++     */
++    public static final int SEARCH_APPOINTMENT_OPTION = 2;
++
++    /**
++     * Alternativ för att uppdatera ett möte.
++     */
++    public static final int UPDATE_APPOINTMENT_OPTION = 3;
++
++    /**
++     * Alternativ för att ta bort ett möte.
++     */
++    public static final int DELETE_APPOINTMENT_OPTION = 4;
++
++    /**
++     * Alternativ för att visa alla schemalagda möten.
++     */
++    public static final int SHOW_ALL_APPOINTMENTS_OPTION = 5;
++
++    /**
++     * Alternativ för att avsluta programmet.
++     */
++    public static final int EXIT_OPTION = 6;
++
++    /**
++     * En instans av InputReader för att hantera användarinmatning.
++     */
++    private static final InputReader inputReader = new InputReader();
++
++    /**
++     * Visar huvudmenyn för användaren och hanterar deras val.
++     */
++    public static void mainMenuOptions() {
++        int option;
++
++        do {
++            displayMainMenu();
++
++            while (true) {
++                try {
++                    option = inputReader.nextInt();
++                    break;
++                } catch (InputMismatchException e) {
++                    System.out.println("Var god ange ett giltigt heltal.");
++                    inputReader.nextLine();
++                }
++            }
++
++            processMainMenuOption(option);
++
++        } while (option != EXIT_OPTION);
++    }
++
++    /**
++     * Visar huvudmenyn för mötesapplikationen.
++     */
++    static void displayMainMenu() {
++        System.out.println("------------------------------------------------------------");
++        System.out.println("                       MÖTESCHEMA");
++        System.out.println("------------------------------------------------------------\n");
++
++        System.out.println(" ANGE ETT ALTERNATIV\n");
++        displayOption(ADD_APPOINTMENT_OPTION, "LÄGG TILL NYTT MÖTE");
++        displayOption(SEARCH_APPOINTMENT_OPTION, "SÖK MÖTE");
++        displayOption(UPDATE_APPOINTMENT_OPTION, "UPPDATERA MÖTE");
++        displayOption(DELETE_APPOINTMENT_OPTION, "TA BORT MÖTE");
++        displayOption(SHOW_ALL_APPOINTMENTS_OPTION, "VISA ALLA MÖTEN");
++        displayOption(EXIT_OPTION, "AVSLUTA PROGRAMMET");
++
++        System.out.println("------------------------------------------------------------\n");
++    }
++
++    /**
++     * Visar ett menyalternativ med en beskrivning.
++     *
++     * @param option      Det numeriska värdet för menyalternativet.
++     * @param description Beskrivningen av menyalternativet.
++     */
++    static void displayOption(int option, String description) {
++        System.out.printf(" %d - %-30s%n", option, description);
++    }
++
++    /**
++     * Hanterar användarens val från huvudmenyn.
++     *
++     * @param option Användarens val.
++     */
++    static void processMainMenuOption(int option) {
++        System.out.println("Bearbetar alternativ: " + option);
++        switch (option) {
++            case ADD_APPOINTMENT_OPTION:
++                displaySubMenu("Lägg till nytt möte");
++                AppointmentAgenda.addAppointment();
++                break;
++            case SEARCH_APPOINTMENT_OPTION:
++                displaySubMenu("Söker...");
++                AppointmentAgenda.searchMenu();
++                displaySubMenu("Slutet på sökningen");
++                break;
++            case UPDATE_APPOINTMENT_OPTION:
++                displaySubMenu("Uppdatera möte");
++                AppointmentAgenda.updateMenu();
++                System.out.println("\nDitt möte har uppdaterats framgångsrikt!\n");
++                break;
++            case DELETE_APPOINTMENT_OPTION:
++                displaySubMenu("Ta bort möte");
++                AppointmentAgenda.deleteMenu();
++                break;
++            case SHOW_ALL_APPOINTMENTS_OPTION:
++                displaySubMenu("Schemalagda möten");
++                AppointmentAgenda.showAppointments();
++                displaySubMenu("Slut på samråd");
++                break;
++            case EXIT_OPTION:
++                System.out.println("Avslutar programmet. Adjö!");
++                break;
++            default:
++                System.out.println("Ogiltigt alternativ");
++                break;
++        }
++    }
++
++    /**
++     * Visar en undermeny med en given titel.
++     *
++     * @param title Titeln på undermenyn.
++     */
++    static void displaySubMenu(String title) {
++        System.out.println("------------------------------------------------------------");
++        System.out.printf("                     %s%n", title);
++        System.out.println("------------------------------------------------------------\n");
++    }
++}

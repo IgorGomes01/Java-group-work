@@ -2,6 +2,8 @@ package org.projektarbete;
 import java.sql.*;
 import java.util.Map;
 
+import static org.projektarbete.DatabaseManager.DRIVER;
+
 /**
  * Hanterar mötesinformation och interaktion med en databas.
  */
@@ -49,8 +51,14 @@ public class AppointmentRepository {
      * Initialiserar databasen genom att skapa nödvändiga tabeller och laddar det totala antalet möten.
      */
     public void initializeDatabase() {
-        DatabaseManager.createDatabaseAndTableIfNotExists();
-        loadTotalMeetings();
+        try {
+            Class.forName(DRIVER); // Ladda JDBC-drivrutinen
+            DatabaseManager.createDatabaseAndTableIfNotExists();
+            loadTotalMeetings();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.err.println("JDBC driver not found");
+        }
     }
 
     /**

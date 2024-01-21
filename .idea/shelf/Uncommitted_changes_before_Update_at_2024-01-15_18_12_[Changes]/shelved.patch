@@ -1,0 +1,347 @@
+Index: src/main/java/org/projektarbete/AppointmentAgenda.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.projektarbete;\r\nimport java.util.InputMismatchException;\r\nimport java.util.Scanner;\r\n\r\npublic class AppointmentAgenda {\r\n\r\n    private static final Scanner scanner = new Scanner(System.in);\r\n    private static final int ADD_APPOINTMENT_OPTION = 1;\r\n    private static final int SEARCH_APPOINTMENT_OPTION = 2;\r\n    private static final int UPDATE_APPOINTMENT_OPTION = 3;\r\n    private static final int DELETE_APPOINTMENT_OPTION = 4;\r\n    private static final int SHOW_ALL_APPOINTMENTS_OPTION = 5;\r\n    private static final int EXIT_OPTION = 6;\r\n\r\n    public static void main(String[] args) {\r\n        mainMenuOptions();\r\n    }\r\n\r\n    private static void mainMenuOptions() {\r\n        int option;\r\n\r\n        do {\r\n            displayMainMenu();\r\n\r\n            while (true) {\r\n                try {\r\n                    option = scanner.nextInt();\r\n                    scanner.nextLine();\r\n                    break;\r\n                } catch (InputMismatchException e) {\r\n                    System.out.println(\"Var god ange ett giltigt heltal.\");\r\n                    scanner.nextLine();\r\n                }\r\n            }\r\n\r\n            processMainMenuOption(option);\r\n\r\n        } while (option != EXIT_OPTION);\r\n    }\r\n\r\n    private static void displayMainMenu() {\r\n        System.out.println(\"------------------------------------------------------------\");\r\n        System.out.println(\"                       MÖTESCHEMA\");\r\n        System.out.println(\"------------------------------------------------------------\\n\");\r\n\r\n        System.out.println(\" ANGE ETT ALTERNATIV\\n\");\r\n        System.out.println(\" \" + ADD_APPOINTMENT_OPTION + \" - LÄGG TILL NYTT MÖTE\");\r\n        System.out.println(\" \" + SEARCH_APPOINTMENT_OPTION + \" - SÖK MÖTE\");\r\n        System.out.println(\" \" + UPDATE_APPOINTMENT_OPTION + \" - UPPDATERA MÖTE\");\r\n        System.out.println(\" \" + DELETE_APPOINTMENT_OPTION + \" - TA BORT MÖTE\");\r\n        System.out.println(\" \" + SHOW_ALL_APPOINTMENTS_OPTION + \" - VISA ALLA MÖTEN\");\r\n        System.out.println(\" \" + EXIT_OPTION + \" - AVSLUTA PROGRAMMET\");\r\n        System.out.println(\"------------------------------------------------------------\\n\");\r\n    }\r\n\r\n    private static void processMainMenuOption(int option) {\r\n        switch (option) {\r\n            case ADD_APPOINTMENT_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                     Lägg till nytt möte\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                break;\r\n            case SEARCH_APPOINTMENT_OPTION:\r\n                System.out.println(\"\\n------------------------------------------------------------\");\r\n                System.out.println(\"                         Söker...\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                System.out.println(\"\\n------------------------------------------------------------\");\r\n                System.out.println(\"                    Slutet på sökningen\");\r\n                System.out.println(\"------------------------------------------------------------\\n\\n\");\r\n                break;\r\n            case UPDATE_APPOINTMENT_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                     Uppdatera möte\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                break;\r\n            case DELETE_APPOINTMENT_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                    Ta bort möte\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                break;\r\n            case SHOW_ALL_APPOINTMENTS_OPTION:\r\n                System.out.println(\"------------------------------------------------------------\");\r\n                System.out.println(\"                    Schemalagda möten\");\r\n                System.out.println(\"------------------------------------------------------------\\n\\n\");\r\n                System.out.println(\"\\n------------------------------------------------------------\");\r\n                System.out.println(\"                      Slut på samråd\");\r\n                System.out.println(\"------------------------------------------------------------\\n\");\r\n                break;\r\n            case EXIT_OPTION:\r\n                System.out.println(\"Avslutar programmet. Adjö!\");\r\n                break;\r\n            default:\r\n                System.out.println(\"Ogiltigt alternativ\");\r\n                break;\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/projektarbete/AppointmentAgenda.java b/src/main/java/org/projektarbete/AppointmentAgenda.java
+--- a/src/main/java/org/projektarbete/AppointmentAgenda.java	(revision dd06c9146ceab1edbef06d34d3cad1d17481102c)
++++ b/src/main/java/org/projektarbete/AppointmentAgenda.java	(date 1705337793764)
+@@ -1,10 +1,18 @@
+ package org.projektarbete;
+ import java.util.InputMismatchException;
+ import java.util.Scanner;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.concurrent.atomic.AtomicInteger;
++
++import static org.projektarbete.Appointment.*;
+ 
+ public class AppointmentAgenda {
+ 
+     private static final Scanner scanner = new Scanner(System.in);
++    private static final List<Appointment> appointments = new ArrayList<>();
++    private static final AtomicInteger idCounter = new AtomicInteger(1);
++
+     private static final int ADD_APPOINTMENT_OPTION = 1;
+     private static final int SEARCH_APPOINTMENT_OPTION = 2;
+     private static final int UPDATE_APPOINTMENT_OPTION = 3;
+@@ -59,11 +67,13 @@
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                     Lägg till nytt möte");
+                 System.out.println("------------------------------------------------------------\n");
++                addAppointment();
+                 break;
+             case SEARCH_APPOINTMENT_OPTION:
+                 System.out.println("\n------------------------------------------------------------");
+                 System.out.println("                         Söker...");
+                 System.out.println("------------------------------------------------------------\n");
++                searchMenu();
+                 System.out.println("\n------------------------------------------------------------");
+                 System.out.println("                    Slutet på sökningen");
+                 System.out.println("------------------------------------------------------------\n\n");
+@@ -72,16 +82,19 @@
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                     Uppdatera möte");
+                 System.out.println("------------------------------------------------------------\n");
++                updateMenu();
+                 break;
+             case DELETE_APPOINTMENT_OPTION:
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                    Ta bort möte");
+                 System.out.println("------------------------------------------------------------\n");
++                deleteAppointment();
+                 break;
+             case SHOW_ALL_APPOINTMENTS_OPTION:
+                 System.out.println("------------------------------------------------------------");
+                 System.out.println("                    Schemalagda möten");
+                 System.out.println("------------------------------------------------------------\n\n");
++                showAllAppointments();
+                 System.out.println("\n------------------------------------------------------------");
+                 System.out.println("                      Slut på samråd");
+                 System.out.println("------------------------------------------------------------\n");
+@@ -94,4 +107,170 @@
+                 break;
+         }
+     }
+-}
++
++    private static void updateMenu() {
++    }
++
++    private static void searchMenu() {
++    }
++
++    private static void addAppointment() {
++        try {
++            System.out.println("Ange fullständigt namn:");
++            String name = scanner.nextLine();
++
++            System.out.println("\nAnge ditt 10-siffriga personnummer:");
++            String idNumber = scanner.nextLine();
++
++            System.out.println("\nAnge e-postadress:");
++            String email = scanner.nextLine();
++
++            System.out.println("\nAnge datum för mötet med format (ÅÅÅÅ-MM-DD):");
++            String date = scanner.nextLine();
++
++            System.out.println("\nAnge tid för mötet med format (HH:MM):");
++            String time = scanner.nextLine();
++
++            System.out.println("\nAnge en beskrivning av mötet:");
++            String description = scanner.nextLine();
++
++            validateName(name);
++            validateIdNumber(idNumber);
++            validateEmail(email);
++            validateDate(date);
++            validateTime(time);
++            validateDescription(description);
++
++            Appointment newAppointment = new Appointment(
++                    generateUniqueId(),
++                    name,
++                    idNumber,
++                    email,
++                    date,
++                    time,
++                    description
++            );
++
++            appointments.add(newAppointment);
++
++            System.out.println("\nDitt möte har lagts till framgångsrikt!\n");
++        } catch (IllegalArgumentException e) {
++            System.out.println("Fel: " + e.getMessage());
++        }
++    }
++
++    private static void validateName(String name) {
++    }
++
++    private static void deleteAppointment() {
++        try {
++            int option;
++            do {
++                System.out.println("Välj alternativ för att ta bort möte:");
++                System.out.println("1. Ange namn");
++                System.out.println("2. Ange personnummer");
++                System.out.println("3. Ange datum");
++                System.out.println("4. Radera alla möten");
++                System.out.println("5. Gå tillbaka till huvudmenyn");
++                option = scanner.nextInt();
++                scanner.nextLine();
++
++                switch (option) {
++                    case 1:
++                        deleteByName();
++                        break;
++                    case 2:
++                        deleteByIdNumber();
++                        break;
++                    case 3:
++                        deleteByDate();
++                        break;
++                    case 4:
++                        deleteAllAppointments();
++                        break;
++                    case 5:
++                        System.out.println("Återgår till huvudmenyn.");
++                        break;
++                    default:
++                        System.out.println("Ogiltigt alternativ. Försök igen.");
++                }
++            } while (option != 5);
++        } catch (InputMismatchException e) {
++            System.out.println("Fel: Ange en giltig siffra.");
++            scanner.nextLine();
++        }
++    }
++    private static void deleteByName() {
++        System.out.println("Ange namnet för mötet du vill ta bort:");
++        String appointmentName = scanner.nextLine();
++
++        appointments.removeIf(appointment -> appointment.getName().equalsIgnoreCase(appointmentName));
++
++        System.out.println("Mötet med namnet '" + appointmentName + "' har tagits bort.");
++    }
++    private static void deleteByIdNumber() {
++        try {
++            System.out.println("Ange personnumret som är kopplat till mötet du vill ta bort:");
++            String appointmentIdNumber = scanner.next();
++
++            boolean removed = appointments.removeIf(appointment -> appointment.getIdNumber().equals(appointmentIdNumber));
++
++            if (removed) {
++                System.out.println("Mötet med personnumret" + appointmentIdNumber + " har tagits bort.");
++            } else {
++                System.out.println("Inget möte hittades med personnumret " + appointmentIdNumber);
++            }
++        } catch (InputMismatchException e) {
++            System.out.println("Fel: Ange ett giltigt personnummer.");
++            scanner.nextLine();
++        }
++    }
++
++    private static void deleteByDate() {
++        System.out.println("Ange datumet för mötet du vill ta bort:");
++        String appointmentDate = scanner.nextLine();
++
++        appointments.removeIf(appointment -> appointment.getDate().equalsIgnoreCase(appointmentDate));
++
++        System.out.println("Möten med datumet '" + appointmentDate + "' har tagits bort.");
++    }
++
++    private static void deleteAllAppointments() {
++        System.out.println("Varning: Detta kommer att radera alla möten. Är du säker? (ja/nej):");
++        String confirmation = scanner.nextLine();
++
++        if (confirmation.equalsIgnoreCase("ja")) {
++            appointments.clear();
++            System.out.println("Alla möten har raderats.");
++        } else {
++            System.out.println("Radering av alla möten avbruten.");
++        }
++    }
++
++    private static void printAppointmentDetails(Appointment appointment) {
++        System.out.println("Mötet med följande detaljer hittades:");
++        System.out.println("ID: " + appointment.getId());
++        System.out.println("Namn: " + appointment.getName());
++        System.out.println("Personnummer: " + appointment.getIdNumber());
++        System.out.println("E-postadress: " + appointment.getEmail());
++        System.out.println("Datum: " + appointment.getDate());
++        System.out.println("Tid: " + appointment.getTime());
++        System.out.println("Beskrivning: " + appointment.getDescription());
++        System.out.println("------------------------------------------------------------");
++    }
++
++    private static void showAllAppointments() {
++        if (appointments.isEmpty()) {
++            System.out.println("Inga möten är schemalagda för närvarande.");
++        } else {
++            for (Appointment appointment : appointments) {
++                printAppointmentDetails(appointment);
++            }
++        }
++    }
++    private static int generateUniqueId() {
++        return idCounter.getAndIncrement();
++
++
++    }
++}
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"b1293931-78f6-405f-9cb5-3f3848f0f5e1\" name=\"Changes\" comment=\"\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/org/example/Main.java\" beforeDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2aifXs9yIRRaT0JvTY28XycGe4T\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Application.AppointmentAgenda.executor\": \"Run\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"git-widget-placeholder\": \"master\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"onboarding.tips.debug.path\": \"C:/Users/zion.awino/java testing/Javagroupwork/Java grgouup work/src/main/java/org/example/Main.java\",\r\n    \"settings.editor.selected.configurable\": \"reference.settings.project.maven.repository.indices\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"jdk-21.0.1-openjdk-21.0.1-f644763e9732-f98dd351\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"b1293931-78f6-405f-9cb5-3f3848f0f5e1\" name=\"Changes\" comment=\"\" />\r\n      <created>1704806365135</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1704806365135</updated>\r\n      <workItem from=\"1704806366219\" duration=\"3000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"XDebuggerManager\">\r\n    <breakpoint-manager>\r\n      <breakpoints>\r\n        <line-breakpoint enabled=\"true\" type=\"java-line\">\r\n          <url>file://$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java</url>\r\n          <line>13</line>\r\n          <option name=\"timeStamp\" value=\"1\" />\r\n        </line-breakpoint>\r\n      </breakpoints>\r\n    </breakpoint-manager>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision dd06c9146ceab1edbef06d34d3cad1d17481102c)
++++ b/.idea/workspace.xml	(date 1705323456190)
+@@ -4,15 +4,21 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="">
+-      <change afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
++    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="1.1 Design och visning av huvudmeny">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="FileTemplateManagerImpl">
++    <option name="RECENT_TEMPLATES">
++      <list>
++        <option value="Class" />
++      </list>
++    </option>
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+@@ -26,22 +32,23 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Application.AppointmentAgenda.executor": "Run",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "git-widget-placeholder": "master",
+-    "kotlin-language-version-configured": "true",
+-    "nodejs_package_manager_path": "npm",
+-    "onboarding.tips.debug.path": "C:/Users/zion.awino/java testing/Javagroupwork/Java grgouup work/src/main/java/org/example/Main.java",
+-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Application.AppointmentAgenda.executor&quot;: &quot;Run&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/zion.awino/java testing/Javagroupwork/Java grgouup work/src/main/java/org/example/Main.java&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
++        <option value="jdk-21.0.1-openjdk-21.0.1-e1d2075fd9a7-b4911678" />
+         <option value="jdk-21.0.1-openjdk-21.0.1-f644763e9732-f98dd351" />
+       </set>
+     </attachedChunks>
+@@ -56,20 +63,28 @@
+       <updated>1704806365135</updated>
+       <workItem from="1704806366219" duration="3000" />
+     </task>
++    <task id="LOCAL−00001" summary="1.1 Design och visning av huvudmeny">
++      <option name="closed" value="true" />
++      <created>1704981018945</created>
++      <option name="number" value="LOCAL−00001" />
++      <option name="presentableId" value="LOCAL−00001" />
++      <updated>1704981018945</updated>
++    </task>
++    <task id="LOCAL−00002" summary="1.1 Design och visning av huvudmeny">
++      <option name="closed" value="true" />
++      <created>1704981207508</created>
++      <option name="number" value="LOCAL−00002" />
++      <option name="presentableId" value="LOCAL−00002" />
++      <updated>1704981207508</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+     <option name="version" value="3" />
+   </component>
+-  <component name="XDebuggerManager">
+-    <breakpoint-manager>
+-      <breakpoints>
+-        <line-breakpoint enabled="true" type="java-line">
+-          <url>file://$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java</url>
+-          <line>13</line>
+-          <option name="timeStamp" value="1" />
+-        </line-breakpoint>
+-      </breakpoints>
+-    </breakpoint-manager>
++  <component name="VcsManagerConfiguration">
++    <MESSAGE value="1.1 Design och visning av huvudmeny" />
++    <option name="LAST_COMMIT_MESSAGE" value="1.1 Design och visning av huvudmeny" />
+   </component>
+ </project>
+\ No newline at end of file

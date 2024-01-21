@@ -11,9 +11,9 @@ public class DatabaseManager {
 
     private static final String SERVER_NAME = "localhost";
     private static final String DATABASE_NAME = "AppointmentScheduler";
-    private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String JDBC_URL = "jdbc:sqlserver://" + SERVER_NAME + ":1433;integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
+    static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
+    private static final String JDBC_URL = "jdbc:sqlserver://" + SERVER_NAME + ":1433;integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
     private static Connection connection; // Deklarera anslutningen på klassnivå
 
     /**
@@ -25,50 +25,57 @@ public class DatabaseManager {
             closeConnection();
         }));
     }
-
     /**
      * Skapar databas och tabell om de inte redan existerar.
      */
     static void createDatabaseAndTableIfNotExists() {
-        try (Connection localConnection = DriverManager.getConnection(JDBC_URL);
-             Statement statement = localConnection.createStatement()) {
+        try {
+            Class.forName(DRIVER); // Ladda JDBC-drivrutinen
 
-            String checkDatabaseQuery = "SELECT 1 FROM sys.databases WHERE name = '" + DATABASE_NAME + "'";
-            ResultSet resultSet = statement.executeQuery(checkDatabaseQuery);
+            try (Connection localConnection = DriverManager.getConnection(JDBC_URL);
+                 Statement statement = localConnection.createStatement()) {
 
-            if (!resultSet.next()) {
-                String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
-                statement.executeUpdate(createDatabaseQuery);
-                System.out.println("Din databas har skapats framgångsrikt!");
+                String checkDatabaseQuery = "SELECT 1 FROM sys.databases WHERE name = '" + DATABASE_NAME + "'";
+                ResultSet resultSet = statement.executeQuery(checkDatabaseQuery);
 
-                try (Connection dbConnection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
-                     Statement dbStatement = dbConnection.createStatement()) {
+                if (!resultSet.next()) {
+                    String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
+                    statement.executeUpdate(createDatabaseQuery);
+                    System.out.println("Din databas har skapats framgångsrikt!");
 
-                    String createTableQuery = "CREATE TABLE Appointments ( " +
-                            "Id INT PRIMARY KEY IDENTITY(1,1), " + // Auto-ökande ID
-                            "Name NVARCHAR(255), " +
-                            "IdNumber NVARCHAR(20), " +
-                            "Email NVARCHAR(255), " +
-                            "Date NVARCHAR(20), " +
-                            "Time NVARCHAR(20), " +
-                            "Description NVARCHAR(MAX) " +
-                            ")";
+                    try (Connection dbConnection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
+                         Statement dbStatement = dbConnection.createStatement()) {
 
-                    dbStatement.executeUpdate(createTableQuery);
-                    System.out.println("Din tabell har skapats framgångsrikt!");
+                        String createTableQuery = "CREATE TABLE Appointments ( " +
+                                "Id INT PRIMARY KEY IDENTITY(1,1), " + // Auto-ökande ID
+                                "Name NVARCHAR(255), " +
+                                "IdNumber NVARCHAR(20), " +
+                                "Email NVARCHAR(255), " +
+                                "Date NVARCHAR(20), " +
+                                "Time NVARCHAR(20), " +
+                                "Description NVARCHAR(MAX) " +
+                                ")";
+
+                        dbStatement.executeUpdate(createTableQuery);
+                        System.out.println("Din tabell har skapats framgångsrikt!");
+                    }
+                } else {
+                    System.out.println("Din databas har redan skapats tidigare.");
                 }
-            } else {
-                System.out.println("Din databas har redan skapats tidigare.");
+
+                // Tilldela localConnection till anslutningen på klassnivå
+                connection = localConnection;
+
+            } catch (SQLException e) {
+                System.err.println("Fel vid skapande eller granskning av databas/tabell: " + e.getMessage());
+                e.printStackTrace();
             }
-
-            // Tilldela localConnection till anslutningen på klassnivå
-            connection = localConnection;
-
-        } catch (SQLException e) {
-            System.err.println("Fel vid skapande eller granskning av databas/tabell: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            System.err.println("JDBC driver not found");
         }
     }
+
 
     /**
      * Etablerar en anslutning till databasen.
@@ -77,7 +84,7 @@ public class DatabaseManager {
      */
     public static Connection getConnection() {
         try {
-            return DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
+            return DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME + ";integratedSecurity=true;encrypt=true;trustServerCertificate=true;");
         } catch (SQLException e) {
             System.err.println("Fel vid etablering av databasanslutning: " + e.getMessage());
             e.printStackTrace();
