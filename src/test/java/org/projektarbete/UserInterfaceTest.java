@@ -1,12 +1,32 @@
 package org.projektarbete;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserInterfaceTest {
+
+    private InputStream originalSystemIn;
+    private PrintStream originalSystemOut;
+
+    @BeforeEach
+    public void setUp() {
+        originalSystemIn = System.in;
+        originalSystemOut = System.out;
+    }
+
+    @AfterEach
+    public void tearDown() {
+        System.setIn(originalSystemIn);
+        System.setOut(originalSystemOut);
+    }
 
     /**
      * Testar metoden displayMainMenu i UserInterface.
@@ -19,8 +39,6 @@ public class UserInterfaceTest {
         System.setOut(new PrintStream(outputStream));
 
         UserInterface.displayMainMenu();
-
-        System.setOut(System.out);
 
         String menuOutput = outputStream.toString();
 
@@ -44,9 +62,6 @@ public class UserInterfaceTest {
 
         UserInterface.processMainMenuOption(UserInterface.ADD_APPOINTMENT_OPTION);
 
-        System.setIn(System.in);
-        System.setOut(System.out);
-
         String output = outputStream.toString();
 
         assertTrue(output.contains("Lägg till nytt möte"));
@@ -68,9 +83,6 @@ public class UserInterfaceTest {
 
         UserInterface.mainMenuOptions();
 
-        System.setIn(System.in);
-        System.setOut(System.out);
-
         String output = outputStream.toString();
 
         assertTrue(output.contains("Var god ange ett giltigt heltal."));
@@ -91,9 +103,6 @@ public class UserInterfaceTest {
         System.setOut(new PrintStream(outputStream));
 
         UserInterface.mainMenuOptions();
-
-        System.setIn(System.in);
-        System.setOut(System.out);
 
         String output = outputStream.toString();
 
