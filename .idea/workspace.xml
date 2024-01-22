@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="1.1 Design och visning av huvudmeny">
+    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Uppdaterad kod med Maven">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/DatabaseManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +22,7 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProblemsViewState">
@@ -188,7 +188,21 @@
       <option name="presentableId" value="LOCAL−00004" />
       <updated>1705786348797</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL−00005" summary="Uppdaterad kod med Maven">
+      <option name="closed" value="true" />
+      <created>1705842847239</created>
+      <option name="number" value="LOCAL−00005" />
+      <option name="presentableId" value="LOCAL−00005" />
+      <updated>1705842847239</updated>
+    </task>
+    <task id="LOCAL−00006" summary="Uppdaterad kod med Maven">
+      <option name="closed" value="true" />
+      <created>1705842977641</created>
+      <option name="number" value="LOCAL−00006" />
+      <option name="presentableId" value="LOCAL−00006" />
+      <updated>1705842977641</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -210,6 +224,7 @@
     <MESSAGE value="Updated the validateDate.now cannoct book meeting in the past." />
     <MESSAGE value="Updated the validation methods. added comments on changes." />
     <MESSAGE value="1.1 Design och visning av huvudmeny" />
-    <option name="LAST_COMMIT_MESSAGE" value="1.1 Design och visning av huvudmeny" />
+    <MESSAGE value="Uppdaterad kod med Maven" />
+    <option name="LAST_COMMIT_MESSAGE" value="Uppdaterad kod med Maven" />
   </component>
 </project>

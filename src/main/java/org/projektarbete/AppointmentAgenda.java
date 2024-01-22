@@ -56,7 +56,7 @@ public class AppointmentAgenda {
 
             System.out.println("\nDitt möte har sparats korrekt.\n");
 
-            System.out.println("Totalt antal möten i systemet: " + appointmentRepository.getRecordCount() + "\n");
+            System.out.println("Totalt antal möten i systemet: " + AppointmentRepository.getRecordCount() + "\n");
 
         } catch (InputMismatchException e) {
             System.out.println("Fel: Ange giltiga data.");
@@ -65,7 +65,7 @@ public class AppointmentAgenda {
     }
 
     /**
-     * Huvudmeny för sökalternativ. Användaren kan välja att söka efter namn, personnummer, datum eller återgå till huvudmenyn.
+     * Visar menyn för sökalternativ och hanterar användarens val.
      */
     static void searchMenu() {
         int searchOption = 0;
@@ -97,39 +97,72 @@ public class AppointmentAgenda {
                     // Återgå till huvudmenyn
                     return;
                 }
-            } catch (InputMismatchException e) {
+            } catch (InputMismatchException | InterruptedException e) {
                 System.out.println("Var god ange ett giltigt heltal.");
                 inputReader.nextLine(); // Konsumera ogiltig inmatning
             }
         } while (searchOption != 4);
     }
 
-    private static void searchByName() {
-        System.out.println("Ange namn att söka efter:");
-        String name = inputReader.nextLine();
-        searchByField("name", name);
+    /**
+     * Söker efter möten baserat på användarens angivna namn.
+     *
+     * @throws InterruptedException Om det uppstår ett avbrott under sökningen.
+     */
+    private static void searchByName() throws InterruptedException {
+        try {
+            System.out.println("Ange namn att söka efter:");
+            String name = inputReader.nextLine();
+            AppointmentRepository.searchByField("name", name);
+        } catch (InterruptedException e) {
+            System.out.println("Något gick fel vid sökningen. Vill du fortsätta? (ja/nej)");
+            if (!askForContinue("sökning")) {
+                return; // Ingen ytterligare åtgärd behövs
+            }
+        }
     }
 
-    private static void searchByIdNumber() {
-        System.out.println("Ange personnummer att söka efter:");
-        String idNumber = inputReader.nextLine();
-        searchByField("idNumber", idNumber);
+    /**
+     * Söker efter möten baserat på användarens angivna personnummer.
+     *
+     * @throws InterruptedException Om det uppstår ett avbrott under sökningen.
+     */
+    private static void searchByIdNumber() throws InterruptedException {
+        try {
+            System.out.println("Ange personnummer att söka efter:");
+            String idNumber = inputReader.nextLine();
+            AppointmentRepository.searchByField("idNumber", idNumber);
+        } catch (InterruptedException e) {
+            System.out.println("Något gick fel vid sökningen. Vill du fortsätta? (ja/nej)");
+            if (!askForContinue("sökning")) {
+                return; // Ingen ytterligare åtgärd behövs
+            }
+        }
     }
 
-    private static void searchByDate() {
-        System.out.println("Ange datum att söka efter:");
-        String date = inputReader.nextLine();
-        searchByField("date", date);
-    }
-
-    private static void searchByField(String field, String value) {
-        appointmentRepository.searchByField(field, value);
+    /**
+     * Söker efter möten baserat på användarens angivna datum.
+     *
+     * @throws InterruptedException Om det uppstår ett avbrott under sökningen.
+     */
+    private static void searchByDate() throws InterruptedException {
+        try {
+            System.out.println("Ange datum att söka efter:");
+            String date = inputReader.nextLine();
+            AppointmentRepository.searchByField("date", date);
+        } catch (InterruptedException e) {
+            System.out.println("Något gick fel vid sökningen. Vill du fortsätta? (ja/nej)");
+            if (!askForContinue("sökning")) {
+                return; // Ingen ytterligare åtgärd behövs
+            }
+        }
     }
 
     /**
      * Huvudmeny för uppdateringsalternativ. Användaren kan välja att uppdatera efter namn, personnummer, datum eller återgå till huvudmenyn.
      */
     static void updateMenu() {
+
         boolean exitUpdateMenu = false;
 
         while (!exitUpdateMenu) {
@@ -221,7 +254,7 @@ public class AppointmentAgenda {
         return new Appointment(newName, newIdNumber, newEmail, newDate, newTime, newDescription);
     }
 
-    private static boolean askForContinue(String context) {
+    static boolean askForContinue(String context) {
         System.out.println("Vill du fortsätta " + context + "? (ja/nej)");
         String response = inputReader.next().toLowerCase();
 
@@ -254,24 +287,45 @@ public class AppointmentAgenda {
 
                 switch (deleteOption) {
                     case 1:
+                        if (AppointmentRepository.getRecordCount() == 0) {
+                            System.out.println("Inga möten att ta bort.");
+                            printReturningToMainMenu();
+                            Thread.sleep(500);
+                            return;
+                        }
                         System.out.println("Ange namnet på mötet du vill ta bort:");
                         String nameToDelete = inputReader.next();
                         appointmentRepository.deleteAppointmentByName(nameToDelete);
                         break;
                     case 2:
+                        if (AppointmentRepository.getRecordCount() == 0) {
+                            System.out.println("Inga möten att ta bort.");
+                            printReturningToMainMenu();
+                            Thread.sleep(500);
+
+                            return;
+                        }
                         System.out.println("Ange personnummer för mötet du vill ta bort:");
                         String idNumberToDelete = inputReader.next();
                         appointmentRepository.deleteAppointmentByIdNumber(idNumberToDelete);
                         break;
                     case 3:
+                        if (AppointmentRepository.getRecordCount() == 0) {
+                            System.out.println("Inga möten att ta bort.");
+                            printReturningToMainMenu();
+                            Thread.sleep(500);
+                            return;
+                        }
                         System.out.println("Ange datumet för mötet du vill ta bort:");
                         String dateToDelete = inputReader.next();
                         appointmentRepository.deleteAppointmentByDate(dateToDelete);
                         break;
                     case 4:
-                        if (appointmentRepository.getRecordCount() == 0) {
+                        if (AppointmentRepository.getRecordCount() == 0) {
                             System.out.println("Inga möten att ta bort.");
-                            continue;
+                            printReturningToMainMenu();
+                            Thread.sleep(500);
+                            return;
                         }
                         appointmentRepository.deleteAllRecords();
                         break;
@@ -282,7 +336,7 @@ public class AppointmentAgenda {
                         break;
                 }
 
-                if (deleteOption != 5 && appointmentRepository.getRecordCount() > 0) {
+                if (deleteOption != 5 && AppointmentRepository.getRecordCount() > 0) {
                     if (!askForContinue("borttagning")) {
                         return; // Om användaren inte vill fortsätta, återgå till huvudmenyn
                     }
@@ -291,7 +345,13 @@ public class AppointmentAgenda {
         } catch (InputMismatchException e) {
             System.out.println("Fel: Ange ett giltigt alternativ");
             inputReader.nextLine();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    static void printReturningToMainMenu() {
+        System.out.println("Återgår till huvudmenyn...");
     }
 
     /**

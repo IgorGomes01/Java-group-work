@@ -2,6 +2,8 @@ package org.projektarbete;
 import java.sql.*;
 import java.util.Map;
 
+import static org.projektarbete.AppointmentAgenda.askForContinue;
+import static org.projektarbete.AppointmentAgenda.printReturningToMainMenu;
 import static org.projektarbete.DatabaseManager.DRIVER;
 
 /**
@@ -23,13 +25,13 @@ public class AppointmentRepository {
 
     // Kartläggning av engelska fältnamn till svenska visningsnamn
     private static final Map<String, String> SWEDISH_FIELD_NAMES = Map.of(
-            FIELD_NAME, "Namn",
-            FIELD_ID_NUMBER, "Personnummer",
-            FIELD_DATE, "Datum"
+            FIELD_NAME, "namn",
+            FIELD_ID_NUMBER, "personnummer",
+            FIELD_DATE, "datum"
     );
 
     // Totalt antal möten
-    private int totalMeetings;
+    private static int totalMeetings;
 
     /**
      * Skapar en AppointmentRepository med en initial totalt möten-räkning på 0.
@@ -43,7 +45,7 @@ public class AppointmentRepository {
      *
      * @return Antalet mötesposter i systemet.
      */
-    public int getRecordCount() {
+    public static int getRecordCount() {
         return totalMeetings;
     }
 
@@ -121,26 +123,44 @@ public class AppointmentRepository {
     }
 
     /**
-     * Söker efter möten baserat på ett fält och dess värde.
+     * Söker efter möten baserat på det angivna fältet och värdet.
      *
-     * @param field Fältet att söka efter.
-     * @param value Värdet att matcha.
+     * @param field Fältet att söka efter (t.ex., "name", "idNumber", "date").
+     * @param value Värdet som ska matchas i det angivna fältet.
+     * @throws InterruptedException Om det uppstår ett avbrott under sökningen.
      */
-    public void searchByField(String field, String value) {
-        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM Appointments WHERE " + field + " = ?")) {
+    public static void searchByField(String field, String value) throws InterruptedException {
+        if (getRecordCount() == 0) {
+            System.out.println("Inga möten att söka.");
+            printReturningToMainMenu();
+            Thread.sleep(500);
+            return;
+        }
 
-            statement.setString(1, value);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME)) {
+            if (recordExistsByField(connection, field, value)) {
+                System.out.println("Mötet med det angivna värdet för fältet " + field + " hittades:");
+                try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Appointments WHERE " + field + " = ?")) {
+                    statement.setString(1, value);
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    printAppointmentDetails(resultSet);
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        while (resultSet.next()) {
+                            printAppointmentDetails(resultSet);
+                        }
+                    }
                 }
+            } else {
+                System.out.println("Ingen post hittades med det angivna värdet för fältet " + field + ".");
+                printReturningToMainMenu();
+                Thread.sleep(500);
             }
         } catch (SQLException e) {
-            handleSQLException("Fel vid sökning efter poster", e);
+            e.printStackTrace();
+            System.out.println("Något gick fel vid sökningen.");
+            askForContinue("sökning");
         }
     }
+
 
     /**
      * Skriver ut detaljer för ett möte från ResultSet till konsolen.
@@ -148,7 +168,7 @@ public class AppointmentRepository {
      * @param resultSet ResultSet som innehåller mötesdetaljerna.
      * @throws SQLException Om det uppstår ett SQL-relaterat fel vid åtkomst till ResultSet.
      */
-    private void printAppointmentDetails(ResultSet resultSet) throws SQLException {
+    private static void printAppointmentDetails(ResultSet resultSet) throws SQLException {
         System.out.println("Namn: " + resultSet.getString("Name"));
         System.out.println("Personnummer: " + resultSet.getString("IdNumber"));
         System.out.println("E-post: " + resultSet.getString("Email"));
@@ -167,7 +187,7 @@ public class AppointmentRepository {
      * @return true om en matchande post finns, annars false.
      * @throws SQLException om det uppstår ett SQL-relaterat fel.
      */
-    private boolean recordExistsByField(Connection connection, String field, String value) throws SQLException {
+    private static boolean recordExistsByField(Connection connection, String field, String value) throws SQLException {
         String query = "SELECT 1 FROM Appointments WHERE " + field + " = ?";
 
         try (PreparedStatement checkStatement = connection.prepareStatement(query)) {
@@ -176,7 +196,6 @@ public class AppointmentRepository {
             return resultSet.next();
         }
     }
-
 
     /**
      * Uppdaterar en mötespost i databasen baserat på det angivna fältet och det gamla värdet.
