@@ -1,7 +1,12 @@
 package org.projektarbete;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 /**
- * Appointment-klassen representerar ett möte och innehåller information om mötet,
- * inklusive namn, ID-nummer, e-postadress, datum, tid och beskrivning.
+ * Klassen Appointment representerar ett möte och innehåller information om mötet,
+ * inklusive namn, personnummer, e-postadress, datum, tid och beskrivning.
  */
 public class Appointment {
     private String name; // Namnet på personen som mötet gäller
@@ -12,21 +17,25 @@ public class Appointment {
     private String description; // Beskrivning av mötet
 
     /**
-     * Skapar en ny instans av Appointment med angiven information.
+     * Konstruktor för att skapa ett Appointment-objekt.
      *
-     * @param name        Namnet för mötet.
-     * @param idNumber    ID-numret för personen.
-     * @param email       E-postadressen för personen.
+     * @param name        Namnet på personen som mötet gäller.
+     * @param idNumber    Personnummer för personen.
+     * @param email       E-postadress för personen.
      * @param date        Datumet för mötet (format: ÅÅÅÅ-MM-DD).
      * @param time        Tiden för mötet (format: HH:MM).
-     * @param description Beskrivningen av mötet.
+     * @param description Beskrivning av mötet.
      */
     public Appointment(String name, String idNumber, String email, String date, String time, String description) {
+        // Konvertera datum och tid till LocalDate och LocalTime
+        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalTime parsedTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+
         this.name = name;
         this.idNumber = idNumber;
         this.email = email;
-        this.date = date;
-        this.time = time;
+        this.date = String.valueOf(parsedDate);
+        this.time = String.valueOf(parsedTime);
         this.description = description;
     }
 

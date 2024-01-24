@@ -1,10 +1,16 @@
 package org.projektarbete;
 import java.sql.*;
 import java.util.Map;
-
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.projektarbete.AppointmentAgenda.askForContinue;
 import static org.projektarbete.AppointmentAgenda.printReturningToMainMenu;
 import static org.projektarbete.DatabaseManager.DRIVER;
+import static org.projektarbete.DatabaseManager.logger;
 
 /**
  * Hanterar mötesinformation och interaktion med en databas.
@@ -14,7 +20,10 @@ public class AppointmentRepository {
     // Fält för databaskolumnernas namn
     private static final String FIELD_NAME = "name";
     private static final String FIELD_ID_NUMBER = "idNumber";
+    private static final String FIELD_EMAIL = "email";
     private static final String FIELD_DATE = "date";
+    private static final String FIELD_TIME = "time";
+    private static final String FIELD_DESCRIPTION = "Description";
 
     // Konstanter för JDBC URL och databasnamn
     private static final String JDBC_URL = DatabaseManager.getJDBCUrl();
@@ -27,7 +36,11 @@ public class AppointmentRepository {
     private static final Map<String, String> SWEDISH_FIELD_NAMES = Map.of(
             FIELD_NAME, "namn",
             FIELD_ID_NUMBER, "personnummer",
-            FIELD_DATE, "datum"
+            FIELD_EMAIL, "e-postadress",
+            FIELD_DATE, "datum",
+            FIELD_TIME, "tid",
+            FIELD_DESCRIPTION, "beskrivningen"
+
     );
 
     // Totalt antal möten
@@ -37,7 +50,7 @@ public class AppointmentRepository {
      * Skapar en AppointmentRepository med en initial totalt möten-räkning på 0.
      */
     public AppointmentRepository() {
-        this.totalMeetings = 0;
+        totalMeetings = 0;
     }
 
     /**
@@ -50,16 +63,21 @@ public class AppointmentRepository {
     }
 
     /**
-     * Initialiserar databasen genom att skapa nödvändiga tabeller och laddar det totala antalet möten.
+     * Initialiserar databasen genom att ladda JDBC-drivrutinen, skapa databas och tabell om de inte redan existerar samt ladda möten från databasen.
+     *
+     * @throws SQLException Kastas om det uppstår ett SQL-relaterat fel.
      */
-    public void initializeDatabase() {
+    public void initializeDatabase() throws SQLException {
         try {
-            Class.forName(DRIVER); // Ladda JDBC-drivrutinen
-            DatabaseManager.createDatabaseAndTableIfNotExists();
+            // Ladda JDBC-drivrutinen
+            Class.forName(DRIVER);
+
+            // Ladda möten från databasen
             loadTotalMeetings();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            System.err.println("JDBC driver not found");
+            // Logga fel med logger och kasta SQLException
+            logger.log(Level.SEVERE, "JDBC-drivrutinen hittades inte", e);
+            throw new SQLException("JDBC-drivrutinen hittades inte", e);
         }
     }
 
@@ -71,23 +89,29 @@ public class AppointmentRepository {
      * Hanterar ett SQLException genom att skriva ut felmeddelandet och stacktrace till standardfelströmmen.
      *
      * @param message Beskrivande meddelande om det uppstådda felet.
-     * @param e SQLException som innehåller information om det uppstådda felet.
+     * @param e       SQLException som innehåller information om det uppstådda felet.
      */
     private void handleSQLException(String message, SQLException e) {
-        System.err.println(message + ": " + e.getMessage());
-        e.printStackTrace();
+        logger.log(Level.SEVERE, message + ": " + e.getMessage(), e);
     }
+
     private void loadTotalMeetings() {
-        try (Connection connection = DatabaseManager.getConnection();
-             Statement statement = connection.createStatement()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            // Check if the connection is not null before proceeding
+            if (connection != null) {
+                try (Statement statement = connection.createStatement()) {
+                    String query = "SELECT COUNT(*) FROM Appointments";
+                    ResultSet resultSet = statement.executeQuery(query);
 
-            String query = "SELECT COUNT(*) FROM Appointments";
-            ResultSet resultSet = statement.executeQuery(query);
-
-            if (resultSet.next()) {
-                totalMeetings = resultSet.getInt(1);
+                    if (resultSet.next()) {
+                        totalMeetings = resultSet.getInt(1);
+                    }
+                }
+            } else {
+                // Handle the case where the connection is null
+                System.err.println("Misslyckades att få en giltig databasanslutning.");
+                // You might want to throw an exception or handle it according to your application's logic
             }
-
         } catch (SQLException e) {
             handleSQLException("Fel vid inläsning av totalMeetings", e);
         }
@@ -100,7 +124,7 @@ public class AppointmentRepository {
      * @throws IllegalArgumentException Om ett fel inträffar under insättning i databasen.
      */
     public void addAppointment(Appointment appointment) {
-        try (PreparedStatement preparedStatement = DatabaseManager.getConnection().prepareStatement(
+        try (PreparedStatement preparedStatement = Objects.requireNonNull(DatabaseManager.getConnection()).prepareStatement(
                 "INSERT INTO Appointments (Name, IdNumber, Email, Date, Time, Description) VALUES (?, ?, ?, ?, ?, ?)")) {
 
             preparedStatement.setString(1, appointment.getName());
@@ -116,9 +140,12 @@ public class AppointmentRepository {
             totalMeetings++;
 
         } catch (SQLException e) {
-            System.err.println("Fel vid läggning av möte i databasen: " + e.getMessage());
-            e.printStackTrace();
-            throw new IllegalArgumentException("Fel vid läggning av möte i databasen: " + e.getMessage());
+            // Use a logger to log the error message and exception
+            Logger logger = Logger.getLogger(getClass().getName());
+            logger.log(Level.SEVERE, "Fel vid läggning av möte i databasen: " + e.getMessage(), e);
+
+            // Optionally, you can throw a more specific exception or handle the error as needed
+            throw new IllegalArgumentException("Fel vid läggning av möte i databasen: " + e.getMessage(), e);
         }
     }
 
@@ -139,7 +166,7 @@ public class AppointmentRepository {
 
         try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME)) {
             if (recordExistsByField(connection, field, value)) {
-                System.out.println("Mötet med det angivna värdet för fältet " + field + " hittades:");
+                System.out.println("Mötet med det angivna värdet för fältet " + getSwedishFieldName(field) + " hittades:");
                 try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Appointments WHERE " + field + " = ?")) {
                     statement.setString(1, value);
 
@@ -150,13 +177,12 @@ public class AppointmentRepository {
                     }
                 }
             } else {
-                System.out.println("Ingen post hittades med det angivna värdet för fältet " + field + ".");
-                printReturningToMainMenu();
-                Thread.sleep(500);
+                System.out.println("Ingen post hittades med det angivna värdet för fältet " + getSwedishFieldName(field) + ".");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Något gick fel vid sökningen.");
+            // Use a logger to log the error message and exception
+            Logger logger = Logger.getLogger(AppointmentRepository.class.getName());
+            logger.log(Level.SEVERE, "Något gick fel vid sökningen.", e);
             askForContinue("sökning");
         }
     }
@@ -198,16 +224,48 @@ public class AppointmentRepository {
     }
 
     /**
+     * Retrieves an Appointment based on the specified field and value.
+     *
+     * @param field The field to search for (e.g., "name", "idNumber", "date").
+     * @param value The value to match in the specified field.
+     * @return The Appointment object if found, or null if not found.
+     * @throws SQLException If there is an SQL-related error during the retrieval.
+     */
+    public Appointment getAppointmentByField(String field, String value) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME)) {
+            if (recordExistsByField(connection, field, value)) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM Appointments WHERE " + field + " = ?")) {
+                    statement.setString(1, value);
+
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        if (resultSet.next()) {
+                            return new Appointment(
+                                    resultSet.getString(FIELD_NAME),
+                                    resultSet.getString(FIELD_ID_NUMBER),
+                                    resultSet.getString(FIELD_EMAIL),
+                                    resultSet.getString(FIELD_DATE),
+                                    resultSet.getString(FIELD_TIME),
+                                    resultSet.getString(FIELD_DESCRIPTION)
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Uppdaterar en mötespost i databasen baserat på det angivna fältet och det gamla värdet.
      *
-     * @param field         Fältet att söka efter (t.ex., "name", "idNumber", "date").
-     * @param oldValue      Det gamla värdet i det angivna fältet.
+     * @param field          Fältet att söka efter (t.ex., "name", "idNumber", "date").
+     * @param oldValue       Det gamla värdet i det angivna fältet.
      * @param newAppointment En Appointment-objekt med uppdaterade värden.
      * @throws SQLException Om det uppstår ett SQL-relaterat fel under uppdateringen.
      */
     void updateRecord(String field, String oldValue, Appointment newAppointment) throws SQLException {
         try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME)) {
-
             // Kontrollera om posten finns innan uppdatering
             if (!recordExistsByField(connection, field, oldValue)) {
                 System.out.println("Ingen post hittades med det angivna värdet för fältet.");
@@ -215,7 +273,6 @@ public class AppointmentRepository {
             }
 
             // Posten finns, fortsätt med uppdateringen
-
             System.out.println("Uppdaterar informationen...");
             Thread.sleep(500);
             System.out.println("Nytt namn: " + newAppointment.getName());
@@ -242,7 +299,8 @@ public class AppointmentRepository {
                 int rowsAffected = updateStatement.executeUpdate();
 
                 if (rowsAffected > 0) {
-                    System.out.println("Posten har uppdaterats framgångsrikt!");
+                    // Print the success message after updating the count
+                    totalMeetings++;
                 } else {
                     System.out.println("Ingen post hittades med det angivna värdet för fältet.");
                 }
@@ -305,6 +363,7 @@ public class AppointmentRepository {
     private void deleteRecordByField(String fieldName, String value) {
         try (Connection connection = DatabaseManager.getConnection()) {
             String deleteQuery = "DELETE FROM Appointments WHERE " + fieldName + " = ?";
+            assert connection != null;
             try (PreparedStatement statement = connection.prepareStatement(deleteQuery)) {
                 statement.setString(1, value);
                 int rowsAffected = statement.executeUpdate();
@@ -316,14 +375,13 @@ public class AppointmentRepository {
         }
     }
 
-
     /**
      * Hämtar det svenska fältnamnet för ett givet engelskt fältnamn.
      *
      * @param englishFieldName Det engelska fältnamnet.
      * @return Det svenska fältnamnet om det finns, annars det engelska fältnamnet.
      */
-    String getSwedishFieldName(String englishFieldName) {
+    static String getSwedishFieldName(String englishFieldName) {
         return SWEDISH_FIELD_NAMES.getOrDefault(englishFieldName, englishFieldName);
     }
 
@@ -416,16 +474,16 @@ public class AppointmentRepository {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString(FIELD_NAME);
                 String idNumber = resultSet.getString(FIELD_ID_NUMBER);
-                String email = resultSet.getString("email");
+                String email = resultSet.getString(FIELD_EMAIL);
                 String date = resultSet.getString(FIELD_DATE);
-                String time = resultSet.getString("time");
-                String description = resultSet.getString("description");
+                String time = resultSet.getString(FIELD_TIME);
+                String description = resultSet.getString(FIELD_DESCRIPTION);
 
                 System.out.println("ID: " + id);
-                System.out.println(getSwedishFieldName(FIELD_NAME) + ": " + name);
-                System.out.println(getSwedishFieldName(FIELD_ID_NUMBER) + ": " + idNumber);
+                System.out.println("Namn: " + name);
+                System.out.println("Personnummer: " + idNumber);
                 System.out.println("E-post: " + email);
-                System.out.println(getSwedishFieldName(FIELD_DATE) + ": " + date);
+                System.out.println("Datum: " + date);
                 System.out.println("Tid: " + time);
                 System.out.println("Beskrivning: " + description);
                 System.out.println("------------------------------------------------------------");

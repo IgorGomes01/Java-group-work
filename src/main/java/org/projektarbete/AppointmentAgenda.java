@@ -1,9 +1,14 @@
 package org.projektarbete;
 import java.sql.*;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static org.projektarbete.AppointmentRepository.getRecordCount;
 
 /**
- * AppointmentAgenda-klassen hanterar mötesagendan och interaktionen med användaren.
+ * Klassen AppointmentAgenda hanterar mötesagendan och interaktionen med användaren.
  * Den innehåller också huvudmetoden för att köra programmet.
  */
 public class AppointmentAgenda {
@@ -13,18 +18,35 @@ public class AppointmentAgenda {
     private static final String FIELD_NAME = "name"; // Konstant för fältet namn i mötesdata
     private static final String FIELD_DATE = "date"; // Konstant för fältet datum i mötesdata
 
+    private static final Logger logger = Logger.getLogger(AppointmentAgenda.class.getName());
+
+
     /**
      * Huvudmetod för att köra programmet. Initialiserar AppointmentRepository och etablerar en databasanslutning.
      * Anropar sedan huvudmenyoptionerna och stänger av skannern när den inte längre behövs.
      */
     public static void main(String[] args) {
-        appointmentRepository.initializeDatabase();
+        try {
+            // Initialisera databasen med hjälp av DatabaseManager
+            DatabaseManager.createDatabaseAndTableIfNotExists();
 
-        UserInterface.mainMenuOptions();
+            // Fortsätt med resten av din kod
+            appointmentRepository.initializeDatabase();
 
-        inputReader.closeScanner();
-
-        appointmentRepository.closeInputReader();
+            // Visa huvudmenyn
+            UserInterface.mainMenuOptions();
+        } catch (SQLException e) {
+            // Logga SQL-fel med logger
+            logger.log(Level.SEVERE, "Fel vid initialisering av databasen: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Logga andra oväntade fel med logger
+            logger.log(Level.SEVERE, "Oväntat fel under initiering: " + e.getMessage(), e);
+        } finally {
+            // Stäng resurser
+            inputReader.closeScanner();
+            appointmentRepository.closeInputReader();
+            DatabaseManager.closeConnection();
+        }
     }
 
     /**
@@ -32,36 +54,30 @@ public class AppointmentAgenda {
      * Visar sedan totalt antal möten i systemet efter att ha lagt till det nya mötet.
      */
     static void addAppointment() {
-        try {
-            System.out.println("Ange fullständigt namn:");
-            String name = inputReader.readString("");
+        String name = inputReader.readString("\nAnge fullständigt namn:\n");
+        String idNumber = inputReader.readString("\nAnge ditt 10-siffriga personnummer:\n");
+        String email = inputReader.readString("\nAnge e-postadress:\n");
+        String date = inputReader.readString("\nAnge datum för mötet (ÅÅÅÅ-MM-DD):\n");
+        String time = inputReader.readString("\nAnge tid för mötet (HH:MM):\n");
+        String description = inputReader.readString("\nAnge beskrivningen av mötet:\n");
 
-            System.out.println("\nAnge ditt 10-siffriga personnummer:");
-            String idNumber = inputReader.readString("");
+        List<String> validationErrors = Validation.validateAllFields(name, idNumber, email, date, time, description);
 
-            System.out.println("\nAnge e-postadress:");
-            String email = inputReader.readString("");
-
-            System.out.println("\nAnge datum för mötet:");
-            String date = inputReader.readString("");
-
-            System.out.println("\nAnge tid för mötet:");
-            String time = inputReader.readString("");
-
-            System.out.println("\nAnge en beskrivning av mötet:");
-            String description = inputReader.readString("");
-
-            Appointment newAppointment = new Appointment(name, idNumber, email, date, time, description);
-            appointmentRepository.addAppointment(newAppointment);
-
-            System.out.println("\nDitt möte har sparats korrekt.\n");
-
-            System.out.println("Totalt antal möten i systemet: " + AppointmentRepository.getRecordCount() + "\n");
-
-        } catch (InputMismatchException e) {
-            System.out.println("Fel: Ange giltiga data.");
-            inputReader.readString(""); // Konsumera ogiltig inmatning
+        if (!validationErrors.isEmpty()) {
+            // Display validation errors
+            System.out.println("Fel vid inmatning:");
+            for (String error : validationErrors) {
+                System.out.println("- " + error);
+            }
+            return; // Stop further processing if there are errors
         }
+
+        // If validation succeeds, create and save the appointment
+        Appointment newAppointment = new Appointment(name, idNumber, email, date, time, description);
+        appointmentRepository.addAppointment(newAppointment);
+
+        System.out.println("\nDitt möte har sparats korrekt.\n");
+        System.out.println("Totalt antal möten i systemet: " + getRecordCount() + "\n");
     }
 
     /**
@@ -91,7 +107,7 @@ public class AppointmentAgenda {
                     default -> System.out.println("Ogiltigt alternativ.");
                 }
 
-                if (searchOption != 4 && askForContinue("sökning")) {
+                if (searchOption != 4 && getRecordCount() > 0 && askForContinue("sökning")) {
                     // Fortsätt söka
                 } else {
                     // Återgå till huvudmenyn
@@ -212,16 +228,48 @@ public class AppointmentAgenda {
 
     private static void updateRecordByField(String field) {
         try {
-            System.out.println("Ange det befintliga värdet för " + appointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
+            System.out.println("Ange det befintliga värdet för " + AppointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
             String oldValue = inputReader.next();
 
-            // Konsumera resten av raden
+            // Consume the rest of the line
             inputReader.nextLine();
 
-            Appointment newAppointment = createAppointmentFromUserInput();
+            Appointment oldAppointment = appointmentRepository.getAppointmentByField(field, oldValue);
 
-            // Anropa updateRecord-metoden i appointmentRepository
+            if (oldAppointment == null) {
+                System.out.println("Ingen post hittades med det angivna värdet. Ingen uppdatering utförd.");
+                return;
+            }
+
+            Appointment newAppointment = createAppointmentFromUserInput(oldAppointment);
+
+            if (newAppointment == null) {
+                System.out.println("Uppdateringen avbröts på grund av felaktig inmatning.");
+                return;
+            }
+
+            // Validate the new appointment
+            List<String> validationErrors = Validation.validateAllFields(
+                    newAppointment.getName(),
+                    newAppointment.getIdNumber(),
+                    newAppointment.getEmail(),
+                    newAppointment.getDate(),
+                    newAppointment.getTime(),
+                    newAppointment.getDescription()
+            );
+
+            if (!validationErrors.isEmpty()) {
+                // Display validation errors
+                System.out.println("Fel vid inmatning:");
+                for (String error : validationErrors) {
+                    System.out.println("- " + error);
+                }
+                return; // Stop further processing if there are errors
+            }
+
+            // Update the appointment if validation succeeds
             appointmentRepository.updateRecord(field, oldValue, newAppointment);
+            System.out.println("Posten har uppdaterats framgångsrikt!");
 
         } catch (InputMismatchException e) {
             System.out.println("Fel: Ange giltiga data.");
@@ -231,27 +279,30 @@ public class AppointmentAgenda {
         }
     }
 
-    private static Appointment createAppointmentFromUserInput() {
-        System.out.println("Ange nytt namn:");
-        String newName = inputReader.nextLine();
+    private static Appointment createAppointmentFromUserInput(Appointment oldAppointment) {
+        System.out.println("Ange nytt namn (gamla värde: " + oldAppointment.getName() + "):");
+        String name = inputReader.nextLine();
 
-        System.out.println("Ange nytt 10-siffrigt personnummer:");
-        String newIdNumber = inputReader.nextLine();
+        System.out.println("Ange nytt 10-siffrigt personnummer (gamla värde: " + oldAppointment.getIdNumber() + "):");
+        String idNumber = inputReader.nextLine();
 
-        System.out.println("Ange ny e-postadress:");
-        String newEmail = inputReader.nextLine();
+        System.out.println("Ange ny e-postadress (gamla värde: " + oldAppointment.getEmail() + "):");
+        String email = inputReader.nextLine();
 
-        System.out.println("Ange nytt datum för mötet:");
-        String newDate = inputReader.nextLine();
+        System.out.println("Ange nytt datum för mötet (gamla värde: " + oldAppointment.getDate() + "):");
+        String date = inputReader.nextLine();
 
-        System.out.println("Ange ny tid för mötet:");
-        String newTime = inputReader.nextLine();
+        System.out.println("Ange ny tid för mötet (gamla värde: " + oldAppointment.getTime() + "):");
+        String time = inputReader.nextLine();
 
-        System.out.println("Ange ny beskrivning av mötet:");
-        String newDescription = inputReader.nextLine();
+        System.out.println("Ange ny beskrivning av mötet (gamla värde: " + oldAppointment.getDescription() + "):");
+        String description = inputReader.nextLine();
 
-        // Skapa och returnera en ny Appointment-objekt med den insamlade informationen
-        return new Appointment(newName, newIdNumber, newEmail, newDate, newTime, newDescription);
+        try {
+            return new Appointment(name, idNumber, email, date, time, description);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     static boolean askForContinue(String context) {
@@ -287,7 +338,7 @@ public class AppointmentAgenda {
 
                 switch (deleteOption) {
                     case 1:
-                        if (AppointmentRepository.getRecordCount() == 0) {
+                        if (getRecordCount() == 0) {
                             System.out.println("Inga möten att ta bort.");
                             printReturningToMainMenu();
                             Thread.sleep(500);
@@ -298,7 +349,7 @@ public class AppointmentAgenda {
                         appointmentRepository.deleteAppointmentByName(nameToDelete);
                         break;
                     case 2:
-                        if (AppointmentRepository.getRecordCount() == 0) {
+                        if (getRecordCount() == 0) {
                             System.out.println("Inga möten att ta bort.");
                             printReturningToMainMenu();
                             Thread.sleep(500);
@@ -310,7 +361,7 @@ public class AppointmentAgenda {
                         appointmentRepository.deleteAppointmentByIdNumber(idNumberToDelete);
                         break;
                     case 3:
-                        if (AppointmentRepository.getRecordCount() == 0) {
+                        if (getRecordCount() == 0) {
                             System.out.println("Inga möten att ta bort.");
                             printReturningToMainMenu();
                             Thread.sleep(500);
@@ -321,7 +372,7 @@ public class AppointmentAgenda {
                         appointmentRepository.deleteAppointmentByDate(dateToDelete);
                         break;
                     case 4:
-                        if (AppointmentRepository.getRecordCount() == 0) {
+                        if (getRecordCount() == 0) {
                             System.out.println("Inga möten att ta bort.");
                             printReturningToMainMenu();
                             Thread.sleep(500);
@@ -336,7 +387,7 @@ public class AppointmentAgenda {
                         break;
                 }
 
-                if (deleteOption != 5 && AppointmentRepository.getRecordCount() > 0) {
+                if (getRecordCount() > 0) {
                     if (!askForContinue("borttagning")) {
                         return; // Om användaren inte vill fortsätta, återgå till huvudmenyn
                     }
@@ -354,6 +405,7 @@ public class AppointmentAgenda {
         System.out.println("Återgår till huvudmenyn...");
     }
 
+
     /**
      * Visar alla möten i systemet.
      */
@@ -361,8 +413,8 @@ public class AppointmentAgenda {
         try {
             appointmentRepository.showRecords();
         } catch (SQLException e) {
-            System.err.println("Fel vid visning av möten: " + e.getMessage());
-            e.printStackTrace();
+            // Log the error using the Logger
+            logger.log(Level.SEVERE, "Fel vid visning av möten: " + e.getMessage(), e);
         }
     }
 }

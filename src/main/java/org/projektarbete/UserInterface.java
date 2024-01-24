@@ -114,7 +114,6 @@ public class UserInterface {
             case UPDATE_APPOINTMENT_OPTION:
                 displaySubMenu("Uppdatera möte");
                 AppointmentAgenda.updateMenu();
-                System.out.println("\nDitt möte har uppdaterats framgångsrikt!\n");
                 break;
             case DELETE_APPOINTMENT_OPTION:
                 displaySubMenu("Ta bort möte");
