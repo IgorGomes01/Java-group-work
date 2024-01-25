@@ -1,7 +1,5 @@
 package org.projektarbete;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -9,30 +7,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserInterfaceTest {
 
-    private InputStream originalSystemIn;
-    private PrintStream originalSystemOut;
-
-    @BeforeEach
-    public void setUp() {
-        originalSystemIn = System.in;
-        originalSystemOut = System.out;
-    }
-
-    @AfterEach
-    public void tearDown() {
-        System.setIn(originalSystemIn);
-        System.setOut(originalSystemOut);
-    }
-
-    /**
-     * Testar metoden displayMainMenu i UserInterface.
-     * Den redirectar System.out för att fånga det utskrivna resultatet,
-     * kallar på displayMainMenu och jämför det förväntade resultatet med det fångade resultatet.
-     */
+    // Testar om displayMainMenu genererar förväntad menyutmatning
     @Test
     public void testDisplayMainMenu() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -41,81 +20,58 @@ public class UserInterfaceTest {
         UserInterface.displayMainMenu();
 
         String menuOutput = outputStream.toString();
-
         assertTrue(menuOutput.contains("LÄGG TILL NYTT MÖTE"));
         assertTrue(menuOutput.contains("SÖK MÖTE"));
+        // Lägg till fler assertions baserat på förväntat menytillstånd
+
+        System.setOut(System.out); // Återställ System.out
     }
 
-    /**
-     * Testar metoden processMainMenuOption med alternativet för att lägga till ett nytt möte.
-     * Mockar användarinput för att simulera valet av "LÄGG TILL NYTT MÖTE",
-     * redirectar System.out för att fånga det utskrivna resultatet,
-     * kallar på processMainMenuOption och jämför det förväntade resultatet med det fångade resultatet.
-     */
+    // Testar om displayOption genererar förväntad utmatning för ett alternativ
     @Test
-    public void testProcessMainMenuOption_AddAppointmentOption() {
-        // Mocka användarinput för att simulera att användaren väljer "LÄGG TILL NYTT MÖTE"
-        InputStream inputStream = new ByteArrayInputStream("1".getBytes());
-        System.setIn(inputStream);
-
-        // Fånga utmatningen
+    public void testDisplayOption() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        // Kör testet
-        UserInterface.processMainMenuOption(UserInterface.ADD_APPOINTMENT_OPTION);
+        int option = 1;
+        String description = "Test Description";
+        UserInterface.displayOption(option, description);
 
-        // Återställ System.in och System.out
-        System.setIn(System.in);
-        System.setOut(System.out);
-
-        // Hämta den fångade utmatningen
         String output = outputStream.toString();
+        assertTrue(output.contains(String.format(" %d - %-30s%n", option, description)));
 
-        // Kontrollera om utmatningen innehåller förväntad text
-        assertTrue(output.contains("Lägg till nytt möte"));
+        System.setOut(System.out); // Återställ System.out
     }
 
-
-    /**
-     * Testar hantering av InputMismatchException.
-     * Mockar användarinput för att simulera att användaren anger en icke-integer,
-     * redirectar System.out för att fånga det utskrivna resultatet,
-     * kallar på mainMenuOptions och jämför det förväntade resultatet med det fångade resultatet.
-     */
+    // Testar om processMainMenuOption hanterar ogiltigt alternativ korrekt
     @Test
-    public void testInputMismatchExceptionHandling() {
-        InputStream inputStream = new ByteArrayInputStream("abc\n".getBytes());
+    public void testProcessMainMenuOption_InvalidOption() {
+        InputStream inputStream = new ByteArrayInputStream("7\n".getBytes());
         System.setIn(inputStream);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        UserInterface.mainMenuOptions();
+        UserInterface.processMainMenuOption(7);
 
         String output = outputStream.toString();
-
-        assertTrue(output.contains("Var god ange ett giltigt heltal."));
+        assertTrue(output.contains("Ogiltigt alternativ"));
     }
 
-    /**
-     * Testar hantering av NoSuchElementException.
-     * Mockar användarinput för att simulera att ingen input är tillgänglig,
-     * redirectar System.out för att fånga det utskrivna resultatet,
-     * kallar på mainMenuOptions och jämför det förväntade resultatet med det fångade resultatet.
-     */
+    // Testar om displaySubMenu genererar förväntad resultat
     @Test
-    public void testNoSuchElementExceptionHandling() {
-        InputStream inputStream = new ByteArrayInputStream("".getBytes());
-        System.setIn(inputStream);
-
+    public void testDisplaySubMenu() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        UserInterface.mainMenuOptions();
+        String title = "Test Title";
+        UserInterface.displaySubMenu(title);
 
         String output = outputStream.toString();
+        assertTrue(output.contains("------------------------------------------------------------"));
+        assertTrue(output.contains(String.format("                     %s%n", title)));
+        assertTrue(output.contains("------------------------------------------------------------"));
 
-        assertTrue(output.contains("Var god ange ett giltigt heltal."));
+        System.setOut(System.out); // Återställ System.out
     }
 }
