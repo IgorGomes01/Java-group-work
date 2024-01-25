@@ -6,9 +6,6 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Hanterar anslutningen till databasen och skapar databas och tabell om de inte redan existerar.
- */
 public class DatabaseManager {
 
     private static final String SERVER_NAME = "localhost";
@@ -16,74 +13,70 @@ public class DatabaseManager {
     static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     private static final String JDBC_URL = "jdbc:sqlserver://" + SERVER_NAME + ":1433;integratedSecurity=true;encrypt=true;trustServerCertificate=true;";
-    private static Connection connection; // Deklarera anslutningen på klassnivå
-    static final Logger logger = Logger.getLogger(DatabaseManager.class.getName());
+    private static Connection connection;
+    static Logger logger = Logger.getLogger(DatabaseManager.class.getName());
 
-    /**
-     * Lägger till en stängningskrok för att rensa upp vid avslut, t.ex. stänga databasanslutningen.
-     */
     static {
-        // Utför städuppgifter vid avslut, såsom att stänga databasanslutningen
         Runtime.getRuntime().addShutdownHook(new Thread(DatabaseManager::closeConnection));
     }
 
-    /**
-     * Skapar databas och tabell om de inte redan existerar.
-     *
-     * @throws SQLException Kastas om det uppstår fel vid skapande eller granskning av databas/tabell.
-     */
-    static void createDatabaseAndTableIfNotExists() throws SQLException {
-        try {
-            // Ladda JDBC-drivrutinen
-            Class.forName(DRIVER);
+    static void createDatabaseIfNotExists() throws SQLException {
+        try (Connection localConnection = DriverManager.getConnection(JDBC_URL);
+             Statement statement = localConnection.createStatement()) {
 
-            try (Connection localConnection = DriverManager.getConnection(JDBC_URL);
-                 Statement statement = localConnection.createStatement()) {
+            String checkDatabaseQuery = "SELECT 1 FROM sys.databases WHERE name = '" + DATABASE_NAME + "'";
+            ResultSet resultSet = statement.executeQuery(checkDatabaseQuery);
 
-                String checkDatabaseQuery = "SELECT 1 FROM sys.databases WHERE name = '" + DATABASE_NAME + "'";
-                ResultSet resultSet = statement.executeQuery(checkDatabaseQuery);
-
-                if (!resultSet.next()) {
-                    // Skapa databasen om den inte redan finns
-                    String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
-                    statement.executeUpdate(createDatabaseQuery);
-                    System.out.println("Databasen har skapats framgångsrikt!");
-
-                    try (Connection dbConnection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
-                         Statement dbStatement = dbConnection.createStatement()) {
-
-                        // Skapa tabellen Appointments
-                        String createTableQuery = "CREATE TABLE Appointments ( " +
-                                "Id INT PRIMARY KEY IDENTITY(1,1), " +
-                                "Name NVARCHAR(MAX), " +
-                                "IdNumber NVARCHAR(20), " +
-                                "Email NVARCHAR(50), " +
-                                "Date NVARCHAR(20), " +
-                                "Time NVARCHAR(20), " +
-                                "Description NVARCHAR(MAX) " +
-                                ")";
-
-                        dbStatement.executeUpdate(createTableQuery);
-                        System.out.println("Tabellen har skapats framgångsrikt!");
-                    }
-                } else {
-                    System.out.println("Databasen har redan skapats tidigare.");
-                }
-
-                // Tilldela localConnection till anslutningen på klassnivå
-                connection = localConnection;
-
-            } catch (SQLException e) {
-                // Logga fel med logger
-                logError("Fel vid skapande eller granskning av databas/tabell: " + e.getMessage());
-                logger.log(Level.SEVERE, "Fel vid skapande eller granskning av databas/tabell", e);
-                throw e; // Kasta om exception för ytterligare hantering
+            if (!resultSet.next()) {
+                String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
+                statement.executeUpdate(createDatabaseQuery);
+                System.out.println("Databasen har skapats framgångsrikt!");
+            } else {
+                System.out.println("Databasen har redan skapats tidigare.");
             }
-        } catch (ClassNotFoundException e) {
-            // Logga fel med logger
-            logError("JDBC-drivrutinen hittades inte");
-            logger.log(Level.SEVERE, "JDBC-drivrutinen hittades inte", e);
+
+            connection = localConnection;
+
+        } catch (SQLException e) {
+            logError("Fel vid skapande eller granskning av databas: " + e.getMessage());
+            logger.log(Level.SEVERE, "Fel vid skapande eller granskning av databas", e);
+            throw e;
         }
+    }
+
+    static void createTableIfNotExists() throws SQLException {
+        try (Connection dbConnection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
+             Statement dbStatement = dbConnection.createStatement()) {
+
+            String checkTableQuery = "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Appointments'";
+            ResultSet resultSet = dbStatement.executeQuery(checkTableQuery);
+
+            if (!resultSet.next()) {
+                String createTableQuery = "CREATE TABLE Appointments ( " +
+                        "Id INT PRIMARY KEY IDENTITY(1,1), " +
+                        "Name NVARCHAR(MAX), " +
+                        "IdNumber NVARCHAR(20), " +
+                        "Email NVARCHAR(50), " +
+                        "Date NVARCHAR(20), " +
+                        "Time NVARCHAR(20), " +
+                        "Description NVARCHAR(MAX) " +
+                        ")";
+                dbStatement.executeUpdate(createTableQuery);
+                System.out.println("Tabellen har skapats framgångsrikt!");
+            } else {
+                System.out.println("Tabellen har redan skapats tidigare.");
+            }
+
+        } catch (SQLException e) {
+            logError("Fel vid skapande eller granskning av tabell: " + e.getMessage());
+            logger.log(Level.SEVERE, "Fel vid skapande eller granskning av tabell", e);
+            throw e;
+        }
+    }
+
+    static void createDatabaseAndTableIfNotExists() throws SQLException {
+        createDatabaseIfNotExists();
+        createTableIfNotExists();
     }
 
     /**
@@ -141,10 +134,7 @@ public class DatabaseManager {
      *
      * @param errorMessage Felmeddelandet att logga.
      */
-    private static void logError(String errorMessage) {
+    static void logError(String errorMessage) {
         logger.log(Level.SEVERE, errorMessage);
     }
 }
-
-
-

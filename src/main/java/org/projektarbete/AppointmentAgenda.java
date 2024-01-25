@@ -5,10 +5,11 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import static org.projektarbete.AppointmentRepository.getRecordCount;
 
 /**
- * Klassen AppointmentAgenda hanterar mötesagendan och interaktionen med användaren.
+ * AppointmentAgenda-klassen hanterar mötesagendan och interaktionen med användaren.
  * Den innehåller också huvudmetoden för att köra programmet.
  */
 public class AppointmentAgenda {
@@ -27,17 +28,17 @@ public class AppointmentAgenda {
      */
     public static void main(String[] args) {
         try {
-            // Initialisera databasen med hjälp av DatabaseManager
+            // Skapa databas och tabell om de inte redan finns
             DatabaseManager.createDatabaseAndTableIfNotExists();
 
-            // Fortsätt med resten av din kod
+            // Initiera databasen och ladda befintliga data
             appointmentRepository.initializeDatabase();
 
-            // Visa huvudmenyn
+            // Fortsätt med resten av din kod
             UserInterface.mainMenuOptions();
         } catch (SQLException e) {
             // Logga SQL-fel med logger
-            logger.log(Level.SEVERE, "Fel vid initialisering av databasen: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Fel under initiering av databasen: " + e.getMessage(), e);
         } catch (Exception e) {
             // Logga andra oväntade fel med logger
             logger.log(Level.SEVERE, "Oväntat fel under initiering: " + e.getMessage(), e);
@@ -48,6 +49,9 @@ public class AppointmentAgenda {
             DatabaseManager.closeConnection();
         }
     }
+
+
+
 
     /**
      * Lägger till ett nytt möte genom att begära användarinput för mötesinformation.
@@ -228,7 +232,7 @@ public class AppointmentAgenda {
 
     private static void updateRecordByField(String field) {
         try {
-            System.out.println("Ange det befintliga värdet för " + AppointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
+            System.out.println("Ange det befintliga värdet för " + appointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
             String oldValue = inputReader.next();
 
             // Consume the rest of the line

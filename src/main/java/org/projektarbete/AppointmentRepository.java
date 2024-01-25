@@ -72,6 +72,9 @@ public class AppointmentRepository {
             // Ladda JDBC-drivrutinen
             Class.forName(DRIVER);
 
+            // Skapa databas och tabell om de inte redan existerar
+            // DatabaseManager.createDatabaseAndTableIfNotExists();
+
             // Ladda möten från databasen
             loadTotalMeetings();
         } catch (ClassNotFoundException e) {
@@ -84,16 +87,6 @@ public class AppointmentRepository {
     /**
      * Laddar det totala antalet möten från databasen.
      */
-
-    /**
-     * Hanterar ett SQLException genom att skriva ut felmeddelandet och stacktrace till standardfelströmmen.
-     *
-     * @param message Beskrivande meddelande om det uppstådda felet.
-     * @param e       SQLException som innehåller information om det uppstådda felet.
-     */
-    private void handleSQLException(String message, SQLException e) {
-        logger.log(Level.SEVERE, message + ": " + e.getMessage(), e);
-    }
 
     private void loadTotalMeetings() {
         try (Connection connection = DatabaseManager.getConnection()) {
@@ -115,6 +108,17 @@ public class AppointmentRepository {
         } catch (SQLException e) {
             handleSQLException("Fel vid inläsning av totalMeetings", e);
         }
+    }
+
+
+    /**
+     * Hanterar ett SQLException genom att skriva ut felmeddelandet och stacktrace till standardfelströmmen.
+     *
+     * @param message Beskrivande meddelande om det uppstådda felet.
+     * @param e SQLException som innehåller information om det uppstådda felet.
+     */
+    private void handleSQLException(String message, SQLException e) {
+        logger.log(Level.SEVERE, message + ": " + e.getMessage(), e);
     }
 
     /**
@@ -188,6 +192,7 @@ public class AppointmentRepository {
     }
 
 
+
     /**
      * Skriver ut detaljer för ett möte från ResultSet till konsolen.
      *
@@ -259,8 +264,8 @@ public class AppointmentRepository {
     /**
      * Uppdaterar en mötespost i databasen baserat på det angivna fältet och det gamla värdet.
      *
-     * @param field          Fältet att söka efter (t.ex., "name", "idNumber", "date").
-     * @param oldValue       Det gamla värdet i det angivna fältet.
+     * @param field         Fältet att söka efter (t.ex., "name", "idNumber", "date").
+     * @param oldValue      Det gamla värdet i det angivna fältet.
      * @param newAppointment En Appointment-objekt med uppdaterade värden.
      * @throws SQLException Om det uppstår ett SQL-relaterat fel under uppdateringen.
      */
