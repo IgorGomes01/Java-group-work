@@ -54,18 +54,28 @@ public class UserInterfaceTest {
      */
     @Test
     public void testProcessMainMenuOption_AddAppointmentOption() {
-        InputStream inputStream = new ByteArrayInputStream("1\n".getBytes());
+        // Mocka användarinput för att simulera att användaren väljer "LÄGG TILL NYTT MÖTE"
+        InputStream inputStream = new ByteArrayInputStream("1".getBytes());
         System.setIn(inputStream);
 
+        // Fånga utmatningen
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
+        // Kör testet
         UserInterface.processMainMenuOption(UserInterface.ADD_APPOINTMENT_OPTION);
 
+        // Återställ System.in och System.out
+        System.setIn(System.in);
+        System.setOut(System.out);
+
+        // Hämta den fångade utmatningen
         String output = outputStream.toString();
 
+        // Kontrollera om utmatningen innehåller förväntad text
         assertTrue(output.contains("Lägg till nytt möte"));
     }
+
 
     /**
      * Testar hantering av InputMismatchException.
