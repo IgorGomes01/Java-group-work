@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/org/projektarbete/Validation.java">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentAgenda.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/AppointmentRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/projektarbete/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/projektarbete/DatabaseManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/org/projektarbete/DatabaseManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/projektarbete/DatabaseManagerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/org/projektarbete/UserInterfaceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/projektarbete/UserInterfaceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/org/projektarbete/ValidationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/projektarbete/ValidationTests.java" afterDir="false" />
-    </list>
+    <list default="true" id="b1293931-78f6-405f-9cb5-3f3848f0f5e1" name="Changes" comment="Uppdatera med tester" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -285,7 +276,14 @@
       <option name="presentableId" value="LOCAL−00011" />
       <updated>1706106145116</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL−00012" summary="Uppdatera med tester">
+      <option name="closed" value="true" />
+      <created>1706195984425</created>
+      <option name="number" value="LOCAL−00012" />
+      <option name="presentableId" value="LOCAL−00012" />
+      <updated>1706195984426</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -310,6 +308,7 @@
     <MESSAGE value="Uppdaterad kod med Maven" />
     <MESSAGE value="Uppdaterad kod" />
     <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/org/projektarbete/Validation.java" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/org/projektarbete/Validation.java" />
+    <MESSAGE value="Uppdatera med tester" />
+    <option name="LAST_COMMIT_MESSAGE" value="Uppdatera med tester" />
   </component>
 </project>
