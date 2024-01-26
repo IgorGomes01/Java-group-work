@@ -30,9 +30,9 @@ public class DatabaseManager {
             if (!resultSet.next()) {
                 String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
                 statement.executeUpdate(createDatabaseQuery);
-                System.out.println("Databasen har skapats framgångsrikt!");
+                System.out.println("Ditt MÖTESSCHEMA har skapats framgångsrikt!");
             } else {
-                System.out.println("Databasen har redan skapats tidigare.");
+                System.out.println("Välkommen tillbaka!");
             }
 
             connection = localConnection;
@@ -62,9 +62,9 @@ public class DatabaseManager {
                         "Description NVARCHAR(MAX) " +
                         ")";
                 dbStatement.executeUpdate(createTableQuery);
-                System.out.println("Tabellen har skapats framgångsrikt!");
+                System.out.println("Lägg till ditt första möte.");
             } else {
-                System.out.println("Tabellen har redan skapats tidigare.");
+                System.out.println("Data från den senaste anslutningen finns kvar i systemet.");
             }
 
         } catch (SQLException e) {

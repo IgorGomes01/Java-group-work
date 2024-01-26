@@ -70,7 +70,7 @@ public class Validation {
     public static void validateIdNumber(String idNumber, List<String> errorMessage) {
         String cleanIdNumber = idNumber.trim().replaceAll("\\s+", "");
         if (cleanIdNumber.length() != 10 || !cleanIdNumber.matches("\\d{10}")) {
-            errorMessage.add("Ogiltigt personnummer. Personnumret måste vara exakt 10 siffror utan andra tecken.");
+            errorMessage.add("Ogiltigt personnummer. Använd 10 siffror.");
         }
     }
 
@@ -84,7 +84,7 @@ public class Validation {
     public static void validateEmail(String email, List<String> errorMessage) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         if (!Pattern.matches(emailRegex, email)) {
-            errorMessage.add("Ogiltig e-postadressformat. Använd t.ex. användarnamn@domän.com.");
+            errorMessage.add("Ogiltig e-postadressformat. T.ex. användarnamn@domän.com.");
         }
     }
 

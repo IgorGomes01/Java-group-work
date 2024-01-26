@@ -24,7 +24,6 @@ public class AppointmentRepository {
     private static final String FIELD_DATE = "date";
     private static final String FIELD_TIME = "time";
     private static final String FIELD_DESCRIPTION = "Description";
-
     // Konstanter för JDBC URL och databasnamn
     private static final String JDBC_URL = DatabaseManager.getJDBCUrl();
     private static final String DATABASE_NAME = DatabaseManager.getDatabaseName();
@@ -90,7 +89,7 @@ public class AppointmentRepository {
 
     private void loadTotalMeetings() {
         try (Connection connection = DatabaseManager.getConnection()) {
-            // Check if the connection is not null before proceeding
+            // Kontrollera om anslutningen inte är null innan du fortsätter
             if (connection != null) {
                 try (Statement statement = connection.createStatement()) {
                     String query = "SELECT COUNT(*) FROM Appointments";
@@ -101,15 +100,13 @@ public class AppointmentRepository {
                     }
                 }
             } else {
-                // Handle the case where the connection is null
+                // Hantera fallet när anslutningen är null
                 System.err.println("Misslyckades att få en giltig databasanslutning.");
-                // You might want to throw an exception or handle it according to your application's logic
             }
         } catch (SQLException e) {
             handleSQLException("Fel vid inläsning av totalMeetings", e);
         }
     }
-
 
     /**
      * Hanterar ett SQLException genom att skriva ut felmeddelandet och stacktrace till standardfelströmmen.
@@ -144,11 +141,10 @@ public class AppointmentRepository {
             totalMeetings++;
 
         } catch (SQLException e) {
-            // Use a logger to log the error message and exception
+            // Använd en logger för att logga felmeddelandet och undantaget
             Logger logger = Logger.getLogger(getClass().getName());
             logger.log(Level.SEVERE, "Fel vid läggning av möte i databasen: " + e.getMessage(), e);
 
-            // Optionally, you can throw a more specific exception or handle the error as needed
             throw new IllegalArgumentException("Fel vid läggning av möte i databasen: " + e.getMessage(), e);
         }
     }
@@ -191,8 +187,6 @@ public class AppointmentRepository {
         }
     }
 
-
-
     /**
      * Skriver ut detaljer för ett möte från ResultSet till konsolen.
      *
@@ -229,12 +223,12 @@ public class AppointmentRepository {
     }
 
     /**
-     * Retrieves an Appointment based on the specified field and value.
+     * Hämtar ett möte baserat på det angivna fältet och värdet.
      *
-     * @param field The field to search for (e.g., "name", "idNumber", "date").
-     * @param value The value to match in the specified field.
-     * @return The Appointment object if found, or null if not found.
-     * @throws SQLException If there is an SQL-related error during the retrieval.
+     * @param field Fältet att söka efter (t.ex., "name", "idNumber", "date").
+     * @param value Värdet som ska matchas i det angivna fältet.
+     * @return Appointment-objektet om det hittas, annars null.
+     * @throws SQLException om det uppstår ett SQL-relaterat fel under hämtningen.
      */
     public Appointment getAppointmentByField(String field, String value) throws SQLException {
         try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME)) {
@@ -304,7 +298,7 @@ public class AppointmentRepository {
                 int rowsAffected = updateStatement.executeUpdate();
 
                 if (rowsAffected > 0) {
-                    // Print the success message after updating the count
+                    // Uppdatera totalMeetings-räkningen efter lyckad uppdatering
                     totalMeetings++;
                 } else {
                     System.out.println("Ingen post hittades med det angivna värdet för fältet.");
@@ -328,8 +322,8 @@ public class AppointmentRepository {
         if (rowsAffected > 0) {
             totalMeetings--;
 
-            if (totalMeetings == 0) {
-                // Återställ identitetsfröet för ID-kolumnen när totalMeetings når 0
+            // Kolla alltid om det finns fler poster i tabellen innan du återställer identitetsfröet
+            if (!hasRecordsInTable()) {
                 resetIdentitySeed();
             }
 
@@ -339,6 +333,28 @@ public class AppointmentRepository {
             System.out.println("Ingen post hittades med " + getSwedishFieldName(fieldName) + " '" + value + "'.");
         }
     }
+
+    /**
+     * Kontrollerar om det finns poster i tabellen.
+     *
+     * @return true om det finns poster, annars false.
+     */
+    private boolean hasRecordsInTable() {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL + ";databaseName=" + DATABASE_NAME);
+             Statement statement = connection.createStatement()) {
+
+            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM Appointments");
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            handleSQLException("Fel vid kontroll av antal poster i tabellen", e);
+        }
+        return false;
+    }
+
 
     /**
      * Återställer identitetsfröet för ID-kolumnen i databasen.

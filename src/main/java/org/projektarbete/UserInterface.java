@@ -63,7 +63,6 @@ public class UserInterface {
             processMainMenuOption(option);
 
         } while (option != EXIT_OPTION);
-
     }
 
     /**
@@ -71,7 +70,7 @@ public class UserInterface {
      */
     static void displayMainMenu() {
         System.out.println("------------------------------------------------------------");
-        System.out.println("                       MÖTESCHEMA");
+        System.out.println("                      MÖTESSCHEMA");
         System.out.println("------------------------------------------------------------\n");
 
         System.out.println(" ANGE ETT ALTERNATIV\n");
