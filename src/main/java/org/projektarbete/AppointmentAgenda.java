@@ -68,15 +68,15 @@ public class AppointmentAgenda {
         List<String> validationErrors = Validation.validateAllFields(name, idNumber, email, date, time, description);
 
         if (!validationErrors.isEmpty()) {
-            // Display validation errors
+            // Visa valideringsfel
             System.out.println("Fel vid inmatning:");
             for (String error : validationErrors) {
                 System.out.println("- " + error);
             }
-            return; // Stop further processing if there are errors
+            return; // Stoppa vidare bearbetning om det finns fel
         }
 
-        // If validation succeeds, create and save the appointment
+        // Om valideringen lyckas, skapa och spara mötet
         Appointment newAppointment = new Appointment(name, idNumber, email, date, time, description);
         appointmentRepository.addAppointment(newAppointment);
 
@@ -232,10 +232,10 @@ public class AppointmentAgenda {
 
     private static void updateRecordByField(String field) {
         try {
-            System.out.println("Ange det befintliga värdet för " + appointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
+            System.out.println("Ange det befintliga värdet för " + AppointmentRepository.getSwedishFieldName(field) + " att uppdatera efter:");
             String oldValue = inputReader.next();
 
-            // Consume the rest of the line
+            // Konsumera resten av raden
             inputReader.nextLine();
 
             Appointment oldAppointment = appointmentRepository.getAppointmentByField(field, oldValue);
@@ -252,7 +252,7 @@ public class AppointmentAgenda {
                 return;
             }
 
-            // Validate the new appointment
+            // Validera det nya mötet
             List<String> validationErrors = Validation.validateAllFields(
                     newAppointment.getName(),
                     newAppointment.getIdNumber(),
@@ -263,12 +263,12 @@ public class AppointmentAgenda {
             );
 
             if (!validationErrors.isEmpty()) {
-                // Display validation errors
+                // Visa valideringsfel
                 System.out.println("Fel vid inmatning:");
                 for (String error : validationErrors) {
                     System.out.println("- " + error);
                 }
-                return; // Stop further processing if there are errors
+                return; // Stoppa vidare bearbetning om det finns fel
             }
 
             // Update the appointment if validation succeeds
@@ -417,7 +417,7 @@ public class AppointmentAgenda {
         try {
             appointmentRepository.showRecords();
         } catch (SQLException e) {
-            // Log the error using the Logger
+            // Logga felet med Logger
             logger.log(Level.SEVERE, "Fel vid visning av möten: " + e.getMessage(), e);
         }
     }
