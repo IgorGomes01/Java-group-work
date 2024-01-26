@@ -63,6 +63,7 @@ public class UserInterface {
             processMainMenuOption(option);
 
         } while (option != EXIT_OPTION);
+
     }
 
     /**
