@@ -40,8 +40,6 @@ public class Validation {
 
         // Fortsätt med ytterligare bearbetning (t.ex. spara mötet)
 
-        // Om det finns ytterligare logik efter validering, placera den här
-
         return errorMessages;
     }
 
